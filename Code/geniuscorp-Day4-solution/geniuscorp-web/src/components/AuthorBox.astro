@@ -1,0 +1,55 @@
+---
+// กล่องผู้เขียนท้ายบทความ: E-E-A-T ที่เครื่องอ่านได้ (ข้อมูลเดียวกับ personSchema)
+import type { TeamMember } from '../lib/types'
+import { formatDate } from '../lib/format'
+
+interface Props {
+  author: TeamMember
+  publishedAt?: string | null
+  updatedAt?: string | null
+}
+
+const { author, publishedAt, updatedAt } = Astro.props
+const isUpdated = updatedAt && publishedAt && new Date(updatedAt) > new Date(publishedAt)
+const hostname = (url: string) => new URL(url).hostname.replace(/^www\./, '')
+---
+
+<aside class="author-box" aria-label="เกี่ยวกับผู้เขียน">
+  {author.photo && (
+    <img src={author.photo} alt={author.name} width="96" height="96" loading="lazy" class="author-photo" />
+  )}
+  <div class="author-body">
+    <p class="author-label">เขียนโดย</p>
+    <p class="author-name">
+      <a href={author.url} rel="author">{author.name}</a>
+      <span class="author-title"> · {author.job_title}</span>
+    </p>
+    {author.bio && <p class="author-bio">{author.bio}</p>}
+
+    {author.social_links.length > 0 && (
+      <ul class="author-social">
+        {author.social_links.map((link) => (
+          <li><a href={link} rel="me noopener" target="_blank">{hostname(link)}</a></li>
+        ))}
+      </ul>
+    )}
+
+    {(publishedAt || updatedAt) && (
+      <p class="author-dates">
+        {publishedAt && (<>เผยแพร่ <time datetime={publishedAt}>{formatDate(publishedAt)}</time></>)}
+        {isUpdated && updatedAt && (<> · แก้ไขล่าสุด <time datetime={updatedAt}>{formatDate(updatedAt)}</time></>)}
+      </p>
+    )}
+  </div>
+</aside>
+
+<style>
+  .author-box { display: flex; gap: 1.25rem; margin: 3rem 0 0; padding: 1.5rem; border: 1px solid #dde4ec; border-radius: 12px; background: #f6f8fb; }
+  .author-photo { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+  .author-label { margin: 0; font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: #8a97a6; }
+  .author-name { margin: .2rem 0; font-weight: 700; font-size: 1.05rem; }
+  .author-title { font-weight: 400; color: #5a6a7d; }
+  .author-bio { margin: .4rem 0; color: #4a5a78; line-height: 1.6; }
+  .author-social { display: flex; gap: .75rem; list-style: none; padding: 0; margin: .5rem 0; font-size: .9rem; }
+  .author-dates { margin: .5rem 0 0; font-size: .85rem; color: #8a97a6; }
+</style>

@@ -1,0 +1,71 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import JsonLd from '../../components/JsonLd.astro'
+import Breadcrumb from '../../components/Breadcrumb.astro'
+import FaqSection from '../../components/FaqSection.astro'
+import { getServices } from '../../lib/api'
+import { formatPrice } from '../../lib/format'
+import {
+  graph, organizationSchema, webPageSchema, serviceSchema, breadcrumbSchema, faqSchema,
+} from '../../lib/schema'
+import type { Service } from '../../lib/types'
+
+export async function getStaticPaths() {
+  const services = await getServices()
+  return services.map((service) => ({ params: { slug: service.slug }, props: { service } }))
+}
+
+interface Props {
+  service: Service
+}
+
+const { service } = Astro.props
+const faqs = service.faqs ?? []
+
+const crumbs = [
+  { name: 'หน้าแรก', url: '/' },
+  { name: 'บริการ', url: '/services/' },
+  { name: service.name },
+]
+
+const jsonLd = graph(
+  organizationSchema(),
+  webPageSchema({
+    url: service.url,
+    name: service.name,
+    description: service.short_description,
+    datePublished: service.published_at,
+    dateModified: service.updated_at,
+  }),
+  serviceSchema(service),
+  breadcrumbSchema(crumbs),
+  faqSchema(faqs),
+)
+---
+
+<BaseLayout
+  seo={{
+    title: service.name,
+    description: service.short_description,
+    canonical: service.url,
+    ogImage: `/images/og/${service.slug}.jpg`,
+  }}
+>
+  <JsonLd slot="head" data={jsonLd} />
+
+  <article class="container">
+    <Breadcrumb crumbs={crumbs} />
+
+    <h1>{service.name}</h1>
+    <p class="lead">{service.short_description}</p>
+
+    <dl class="facts">
+      {service.price_from && (<><dt>ราคาเริ่มต้น</dt><dd>{formatPrice(service.price_from)} {service.price_currency}</dd></>)}
+      {service.duration_days && (<><dt>ระยะเวลาดำเนินการ</dt><dd>{service.duration_days} วัน</dd></>)}
+    </dl>
+
+    <div class="prose" set:html={service.description} />
+
+    <FaqSection faqs={faqs} />
+  </article>
+</BaseLayout>

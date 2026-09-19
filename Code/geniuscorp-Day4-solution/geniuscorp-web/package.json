@@ -1,0 +1,16 @@
+{
+  "name": "geniuscorp-web",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build && node scripts/check-geo.mjs",
+    "preview": "astro preview",
+    "astro": "astro",
+    "check:geo": "node scripts/check-geo.mjs"
+  },
+  "dependencies": {
+    "astro": "^6.0.0"
+  }
+}

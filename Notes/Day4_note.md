@@ -1165,7 +1165,7 @@ sudo chmod -R 770 storage bootstrap/cache
 | ขั้นตอน                        | รายละเอียด                                                                                                               |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
 | 1. Backup ก่อนทุกอย่าง           | Export จาก Local (All-in-One WP Migration) + เก็บ SQL dump แยก                                                             |
-| 2. ย้ายขึ้นเซิร์ฟเวอร์           | ติดตั้ง WordPress เปล่าบน production → ติดตั้ง All-in-One WP Migration → Import ไฟล์ .wpress → ล็อกอินใหม่ → Permalinks Save |
+| 2. ย้ายขึ้นเซิร์ฟเวอร์           | ติดตั้ง WordPress เปล่าบน production → ติดตั้ง All-in-One WP Migration ทั้งสองฝั่ง → Export `.wpress` จากเว็บในเครื่องที่ Retrofit เสร็จแล้ว (ไฟล์นี้ผู้เรียนสร้างเองในการบ้าน Day 3 ข้อ 5 ไม่ใช่ Demo `.xml`) → Import บน production → ล็อกอินใหม่ด้วยบัญชีเดิมของเว็บในเครื่อง → Permalinks Save |
 | 3. `wp-config.php`             | `DB_*` ของ production, `WP_DEBUG false`, `DISALLOW_FILE_EDIT true` (ปิดแก้ไฟล์ theme/plugin จากหน้า Admin), `FORCE_SSL_ADMIN true`, salt ใหม่จาก api.wordpress.org/secret-key/1.1/salt/ |
 | 4. สิทธิ์ไฟล์                   | โฟลเดอร์ 755, ไฟล์ 644, `wp-config.php` 640, `wp-content/uploads` เขียนได้โดย www-data; ห้าม 777                              |
 | 5. ปิดช่องทางที่ไม่ใช้           | XML-RPC (ทำแล้วใน Day 3), ปิด user enumeration `/?author=1` (Rank Math → Titles → Authors → noindex หรือ redirect), เปลี่ยน URL login ถ้าต้องการ, จำกัด login attempts |

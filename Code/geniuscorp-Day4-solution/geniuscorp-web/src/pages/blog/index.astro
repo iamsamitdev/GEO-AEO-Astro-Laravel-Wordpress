@@ -1,0 +1,30 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import JsonLd from '../../components/JsonLd.astro'
+import Breadcrumb from '../../components/Breadcrumb.astro'
+import ArticleCard from '../../components/ArticleCard.astro'
+import { getArticles } from '../../lib/api'
+import { graph, organizationSchema, webPageSchema, breadcrumbSchema, itemListSchema } from '../../lib/schema'
+
+const articles = await getArticles()
+const description = 'บทความเทคนิคด้านการพัฒนาเว็บ โมบายแอป และ GEO/AEO จากทีม GeniusCorp อัปเดตทุกสัปดาห์ พร้อมตัวอย่างโค้ดและตัวเลขที่วัดได้จริง'
+const crumbs = [{ name: 'หน้าแรก', url: '/' }, { name: 'บทความ' }]
+
+const jsonLd = graph(
+  organizationSchema(),
+  webPageSchema({ url: '/blog/', name: 'บทความและข่าวสาร', description, type: 'CollectionPage' }),
+  breadcrumbSchema(crumbs),
+  itemListSchema(articles.map((a) => ({ name: a.title, url: a.url }))),
+)
+---
+
+<BaseLayout seo={{ title: 'บทความและข่าวสาร', description, canonical: '/blog/' }}>
+  <JsonLd slot="head" data={jsonLd} />
+  <section class="container">
+    <Breadcrumb crumbs={crumbs} />
+    <h1>บทความและข่าวสาร</h1>
+    <div class="grid">
+      {articles.map((article) => <ArticleCard article={article} />)}
+    </div>
+  </section>
+</BaseLayout>

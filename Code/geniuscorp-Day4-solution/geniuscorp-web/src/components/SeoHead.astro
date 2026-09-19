@@ -1,0 +1,85 @@
+---
+// จุดเดียวจัดการ Metadata ของทุกหน้า
+import { SITE, absoluteUrl } from '../lib/site'
+
+export interface SeoProps {
+  title: string
+  description: string
+  canonical?: string
+  ogImage?: string
+  type?: 'website' | 'article'
+  publishedTime?: string | null
+  modifiedTime?: string | null
+  authorUrl?: string | null
+  section?: string
+  noindex?: boolean
+  isHome?: boolean
+  alternates?: { lang: string, href: string }[]
+}
+
+type Props = SeoProps
+
+const {
+  title,
+  description,
+  canonical,
+  ogImage,
+  type = 'website',
+  publishedTime,
+  modifiedTime,
+  authorUrl,
+  section,
+  noindex = false,
+  isHome = false,
+  alternates = [],
+} = Astro.props
+
+const fullTitle = isHome ? SITE.defaultTitle : `${title} | ${SITE.name}`
+
+// Canonical: ตัด query string และ hash ทิ้งเสมอ
+const canonicalUrl = canonical
+  ? absoluteUrl(canonical)
+  : new URL(Astro.url.pathname, SITE.url).toString()
+
+const ogImageUrl = absoluteUrl(ogImage ?? SITE.defaultOgImage)
+
+if (fullTitle.length > 65) {
+  console.warn(`[SeoHead] title ยาว ${fullTitle.length} ตัวอักษร: ${Astro.url.pathname}`)
+}
+if (description.length > 170 || description.length < 70) {
+  console.warn(`[SeoHead] description ยาว ${description.length} ตัวอักษร: ${Astro.url.pathname}`)
+}
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonicalUrl} />
+{noindex && <meta name="robots" content="noindex, nofollow" />}
+
+{alternates.map((alt) => (
+  <link rel="alternate" hreflang={alt.lang} href={absoluteUrl(alt.href)} />
+))}
+
+<meta property="og:type" content={type} />
+<meta property="og:title" content={isHome ? SITE.defaultTitle : title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:image" content={ogImageUrl} />
+<meta property="og:site_name" content={SITE.name} />
+<meta property="og:locale" content={SITE.locale} />
+
+{type === 'article' && publishedTime && (
+  <meta property="article:published_time" content={publishedTime} />
+)}
+{type === 'article' && modifiedTime && (
+  <meta property="article:modified_time" content={modifiedTime} />
+)}
+{type === 'article' && authorUrl && (
+  <meta property="article:author" content={absoluteUrl(authorUrl)} />
+)}
+{type === 'article' && section && <meta property="article:section" content={section} />}
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={isHome ? SITE.defaultTitle : title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImageUrl} />

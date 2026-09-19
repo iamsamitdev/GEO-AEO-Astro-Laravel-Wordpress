@@ -47,19 +47,67 @@
 
 ### เวลา 20:30-20:45 น.
 
+**ขั้นที่ 0 - ตรวจ theme และ plugin ที่ต้องมีก่อนเริ่ม** (ตามที่ precourse ส่วน B2 ให้เตรียมไว้ ถ้ายังไม่ได้ทำให้ทำตอนนี้ ใช้เวลา ~5 นาที)
+
+**0.1 Theme: ติดตั้งและเปิดใช้ Astra (ฟรี) ก่อน Import**
+
+WordPress ติดตั้งใหม่มาพร้อม theme **Twenty Twenty-Five** ซึ่งเป็น **block theme (Full Site Editing)**: header/footer เป็นไฟล์ `.html` ใน `templates/` และ `parts/` แก้ผ่าน Site Editor ไม่มี `header.php` / `single.php` ให้ override และไม่มี filter ชื่อ site title ส่วน Child Theme `geniuscorp-geo` ที่เราจะเขียนวันนี้เป็น **classic theme** (`single-service.php`, `archive-service.php` เรียก `get_header()` / `get_footer()`) ถ้าเปิดบน Twenty Twenty-Five หน้าบริการจะออกมาไม่มี header/footer ของ theme และโค้ด heading ใน Module 3.4 จะไม่ทำงาน ดังนั้น:
+
+1. Appearance → Themes → **Add New Theme** → ค้นหา **Astra** → Install → **Activate** (ข้อความชวนติดตั้ง "Starter Templates" ปิดได้เลย ไม่ต้องใช้)
+2. ตรวจ: Appearance → Themes แสดง **Astra: Active** และเมนู Appearance มี **Customize** (ถ้าเห็น **Editor** แทน แสดงว่ายังเป็น block theme อยู่)
+
+เหตุผลที่คอร์สเลือก Astra: เป็น classic theme ที่เว็บองค์กรไทยใช้กันมาก (active installs 1 ล้าน+ บน wordpress.org) มี filter `astra_site_title_tag` ให้แก้ tag ของโลโก้โดยไม่ต้อง override template และมี Schema แบบ microdata ในตัว (attribute `itemtype` / `itemprop` ในแท็ก HTML) ซึ่งเป็นตัวอย่างจริงของ "Schema ซ้อนกันหลายแหล่ง" ในปัญหาข้อ 6 · ผู้เรียนที่ใช้ GeneratePress หรือ Kadence กับเว็บจริงทำได้เหมือนกัน (`geo-headings.php` มี filter ของทั้ง 3 theme) แต่ในคลาสขอให้ใช้ Astra เพื่อให้ทุกคนเห็นผลตรงกัน
+
+**0.2 Plugin**
+
+Child Theme `geniuscorp-geo` **พึ่งพา plugin 2 ตัว** และใช้อีก 2 ตัวเป็นเครื่องมือ ตรวจที่ Plugins → Installed Plugins ให้สถานะตรงตามตารางนี้ก่อน Import:
+
+| Plugin | สถานะที่ต้องเป็นตอนนี้ | ใช้ทำอะไร / ใช้ใน Module ไหน | ไฟล์ใน Child Theme ที่พึ่งพา |
+| --- | --- | --- | --- |
+| **Rank Math SEO** (หรือ Yoast SEO ถ้าถนัดกว่า) | **เปิดใช้งาน (Active)** | Title / Meta / Canonical / OG / Sitemap (Module 3) และเป็นตัวที่เราต้อง "ปิด Schema" ของมัน (Module 4) | `geo-cleanup.php`, `geo-metadata.php`, `geo-post-types.php`, `geo-llms.php` (Day 4) |
+| **Advanced Custom Fields (ACF)** | **เปิดใช้งาน (Active)** | ฟิลด์ราคา/ระยะเวลา/FAQ ของบริการ (Module 4-5) และตำแหน่ง/social ของผู้เขียน (Day 4) | `geo-post-types.php`, `geo-faq.php`, `geo-eeat.php` (Day 4) |
+| **Query Monitor** | ติดตั้งไว้ เปิดได้เลย (ใช้เฉพาะเครื่องพัฒนา) | หา query/scripts/hook ที่ทำให้ช้า และหาชื่อ callback ของ theme ที่ต้อง remove (Module 2, 4) | ไม่ผูกกับโค้ด |
+| **LiteSpeed Cache** (หรือ WP Super Cache / WP Rocket) | ติดตั้งไว้ **แต่ห้ามเปิด** จนถึง Module 6 | Page cache, minify, WebP (Module 6) | ไม่ผูกกับโค้ด |
+
+> 📌 **ถ้าไม่มี ACF จะเกิดอะไร:** Child Theme ไม่พัง (ทุกจุดครอบด้วย `function_exists('get_field')`) แต่หน้า Admin จะไม่มีช่องกรอกราคา/FAQ/ตำแหน่งผู้เขียน ทำให้ Service Schema ไม่มี `Offer`, ไม่มี FAQPage และ Person ไม่มี `jobTitle` · **ถ้าไม่มี Rank Math/Yoast:** จะไม่มีใครสร้าง Title/Description/Canonical/OG/Sitemap เพราะ Child Theme ตั้งใจไม่เขียนส่วนนี้เอง (ดูขอบเขต plugin vs โค้ดใน Module 1.4)
+>
+> 📌 **ACF ฟรี vs ACF PRO:** ฟิลด์ FAQ แบบ Repeater ต้องใช้ **ACF PRO** ถ้ามีเฉพาะ ACF ฟรี โค้ดใน `geo-faq.php` จะสลับไปใช้ Custom Post Type `faq` แยกให้อัตโนมัติ (อธิบายใน Module 5.1) ผลลัพธ์ปลายทางเหมือนกัน
+>
+> ⚠️ **ห้ามเปิด plugin cache ตอนนี้** เพราะจะเก็บหน้าเว็บไว้ ทำให้แก้โค้ดแล้วไม่เห็นผล เดี๋ยวเปิดพร้อมกันตอนวัด Performance ใน Module 6
+
 **ขั้นที่ 1 - Import Demo Site** (เว็บ WordPress เปล่าที่เตรียมไว้ตาม precourse ส่วน B)
 
-1. Plugins → Add New → ค้นหา **All-in-One WP Migration** → Install + Activate
-2. All-in-One WP Migration → **Import** → ลากไฟล์ `geniuscorp-wp-demo.wpress` (ถ้าไฟล์ใหญ่กว่า limit ให้ติดตั้ง extension ฟรี "Unlimited" ตามลิงก์ในกลุ่ม หรือใช้วิธี SQL dump + คัดลอก `wp-content` ที่แนบมาแทน)
-3. หลัง Import เสร็จ ล็อกอินใหม่ด้วย user `gcadmin` รหัสผ่านตามที่แจ้งในกลุ่มไลน์ แล้วไปที่ Settings → Permalinks → กด **Save Changes** หนึ่งครั้ง (เพื่อ flush rewrite rules)
+ไฟล์ Demo Site เป็น **WordPress eXtended RSS (.xml)** Import ได้ด้วยเครื่องมือในตัว WordPress ไม่ต้องติดตั้ง plugin เสริม และ **ไม่มีผู้ใช้/รหัสผ่านใด ๆ ในไฟล์** ผู้เรียนใช้บัญชี admin ที่สร้างเองตอนติดตั้ง WordPress
+
+| สิ่งที่ต้องมี | อยู่ที่ไหน |
+| --- | --- |
+| `geniuscorp-wp-demo.xml` (Demo Site) | โฟลเดอร์โค้ดเฉลย `Code/Day3/geniuscorp-wp/demo-site/` หรือแตกจาก `Code/geniuscorp-Day3-solution.zip` → `geniuscorp-wp/demo-site/` |
+| `README.md` (วิธี Import + รายการปัญหาที่ใส่ไว้) | โฟลเดอร์เดียวกัน |
+| `fix-lastmod-after-import.sql` (ใช้ท้าย Day 3 / Day 4) | `Code/Day4/geniuscorp-wp/demo-site/` |
+
+ขั้นตอน Import:
+
+1. เข้า `http://geniuscorp.test/wp-admin` → **Tools → Import** → แถว **WordPress** กด **Install Now** แล้วกด **Run Importer**
+2. **Choose File** → เลือก `geniuscorp-wp-demo.xml` → **Upload file and import**
+3. หน้า Assign Authors: เลือก **assign posts to an existing user** = บัญชี admin ของคุณ (ไม่ต้องติ๊ก Download and import file attachments เพราะ Demo ไม่มีรูป) → **Submit** รอจนขึ้น "All done. Have fun!"
+4. **Settings → Reading** → Your homepage displays = **A static page** → Homepage = **หน้าแรก**, Posts page = **บทความ** → Save Changes
+5. **Settings → Permalinks** → เลือก **Post name** → Save Changes (flush rewrite rules)
+6. เปิด `http://geniuscorp.test/` ต้องเห็นหน้าแรก, `/services/` (หน้า "บริการ"), `/blog/` และ `/web-development/` ถ้า theme ไม่แสดงเมนูให้สร้างที่ Appearance → Menus (ใส่หน้า หน้าแรก, เกี่ยวกับเรา, บริการ, บทความ, ติดต่อเรา)
+7. **Settings → General** (ตั้งค่า → ทั่วไป) → ชื่อเว็บ = `GeniusCorp` และช่อง **คำโปรย (Tagline)** วางข้อความนี้ทั้งบรรทัด:
+   `บริษัทพัฒนาเว็บ แอป ซอฟต์แวร์ ERP CRM ครบวงจร ราคาถูก คุณภาพดี บริการทั่วประเทศ รับทำเว็บไซต์ รับเขียนโปรแกรม รับทำแอป`
+   แล้ว Save Changes (ตั้งใจให้ยาวและยัด keyword เพื่อจำลอง "ปัญหาข้อ 3": Rank Math ค่าเริ่มต้นใช้ Tagline (`%sitedesc%`) ใน **Title ของหน้าแรก** และ theme ส่วนใหญ่แสดง Tagline ใต้โลโก้หรือใน footer ทุกหน้า เราจะแก้ใน Module 3) · หมายเหตุ: WordPress Importer นำเข้าเฉพาะโพสต์/หน้า/หมวดหมู่ ไม่แตะ Settings จึงต้องตั้งเองข้อนี้
+
+ตรวจผลก่อนไปต่อ: เปิด `view-source:http://geniuscorp.test/web-development/` ควรเห็น `<h1` **2 ตัว** (ของ theme + ในเนื้อหา), `application/ld+json` **1 block** ของ Rank Math ที่มี `"@type":"Article"` และ `"name":"..."` ขององค์กรเป็นชื่อเก่าจากตอนติดตั้ง WordPress, `<meta name="description"` เป็นย่อหน้าแนะนำบริษัท, และ `<title>` สั้น (`รับพัฒนาเว็บไซต์องค์กร - GeniusCorp`) ถ้าได้แบบนี้แปลว่า "สภาพก่อน Retrofit" ถูกต้องแล้ว
+
+> ⛔ **ถ้า Import ไม่ขึ้นหน้า Assign Authors หรือ error "This does not appear to be a WXR file":** ตรวจว่าเลือกไฟล์ `.xml` ไม่ใช่ `.zip` และไฟล์ไม่ถูกเปิดแก้ด้วย Word/Notepad จนเปลี่ยน encoding · **ถ้าอัปโหลดไม่ได้เพราะไฟล์ใหญ่กว่า `upload_max_filesize`:** ไฟล์นี้ขนาดเพียง ~42 KB จึงไม่ควรเกิด ถ้าเกิดให้ตรวจ php.ini ของ Laragon
 
 **ขั้นที่ 2 - ทัวร์ปัญหาที่ตั้งใจใส่ไว้ใน Demo Site** (ตรงกับที่พบใน Audit เว็บจริงทั้งหมด)
 
 | # | ปัญหาใน GeniusCorp WP                                                                | ที่มาจาก Audit จริง           | แก้ใน Module |
 | - | ------------------------------------------------------------------------------------ | ----------------------------- | ------------ |
-| 1 | Theme ใช้ `<h1>` กับโลโก้ในทุกหน้า + หน้าเดี่ยวมี `<h1>` ของชื่อเรื่องอีก → H1 ซ้ำ 2 ตัว | Theme สร้าง H1 ซ้ำ            | 3            |
-| 2 | หน้ารวมบริการ (Page Builder) ทำการ์ดเป็น `<h2>` 8 ตัว และหน้าแรก **ไม่มี H1**            | Heading เป็น noise, หน้าแรกไม่มี H1 | 3       |
-| 3 | Title ทุกหน้าเป็น `%sitename% - บริษัทพัฒนาเว็บ แอป ซอฟต์แวร์ ERP CRM ...` ยาว 200+ ตัวอักษร | Title ยาว + keyword stuffing | 3            |
+| 1 | หน้าบริการมี `<h1>` **ในเนื้อหา** (คนเขียนใส่เองใน editor) ซ้อนกับ `<h1 class="entry-title">` ที่ theme ใส่ให้ → H1 ซ้ำ 2 ตัว (theme บางตัวยังทำโลโก้เป็น `<h1>` ทุกหน้าซ้ำอีกชั้น; Astra ทำโลโก้เป็น H1 เฉพาะหน้าแรก) | Theme/เนื้อหา สร้าง H1 ซ้ำ    | 3            |
+| 2 | หน้าแรก: เนื้อหา **ไม่มี H1** (hero เป็น `div`, ตัวเลขสถิติเป็น `h2`) H1 เดียวที่มีคือชื่อเว็บจากโลโก้ซึ่งบอกแค่ "GeniusCorp" ไม่บอกว่าทำอะไร + หน้ารวมบริการทำการ์ดเป็น `<h2>` 8 ตัว | Heading เป็น noise, หน้าแรกไม่มี H1 | 3       |
+| 3 | Tagline ที่ตั้งไว้ในขั้นที่ 1 ข้อ 7 ยาว 100+ ตัวอักษรแบบ keyword stuffing → Rank Math ค่าเริ่มต้นของหน้าแรก `%sitename% %page% %sep% %sitedesc%` ทำให้ **Title หน้าแรกยาว 120+ ตัวอักษร** และ theme แสดง Tagline ใต้โลโก้/ใน footer ทุกหน้า (หน้าอื่น Title ยังสั้นเพราะค่าเริ่มต้นคือ `%title% %sep% %sitename%` แต่เว็บจริงจำนวนมากถูกแก้ให้ต่อ `%sitedesc%` ทุกหน้า) | Title ยาว + keyword stuffing | 3            |
 | 4 | Meta description ว่างทุกหน้า → Rank Math auto-generate จากย่อหน้าแรกที่เป็น boilerplate  | description boilerplate       | 3            |
 | 5 | มี `?utm_source=`, `?ref=` และหน้า `/services/?page=2` ที่ canonical ชี้ผิด             | ไม่มี/ผิด Canonical           | 3            |
 | 6 | Rank Math เปิด Schema "Article" ให้ **ทุก post type** รวมหน้าบริการ + Theme ฉีด Organization ของตัวเอง + Page Builder ฉีด WebPage → Schema ซ้อน 3 ชุด ขัดกัน | Schema ซ้ำจากหลาย Plugin | 4 |
@@ -69,6 +117,8 @@
 | 10 | เปิด Plugin 23 ตัว (slider 2 ตัว, contact form 2 ตัว, page builder + addon 5 ตัว) ไม่มี cache | Plugin ทำเว็บช้า, HTML 480KB | 6           |
 | 11 | robots.txt เป็นค่าเริ่มต้นและ sitemap ของ Rank Math มี `lastmod` เท่ากันทุก URL (เพราะ import) | Sitemap lastmod ไม่จริง      | Day 4        |
 | 12 | ไม่มี llms.txt                                                                        | ไม่มี llms.txt                | Day 4        |
+
+> 📌 **ปัญหาไหนอยู่ในไฟล์ Demo (.xml) และปัญหาไหนมาจากเครื่องของผู้เรียน:** ไฟล์ WXR นำเข้าได้เฉพาะ "เนื้อหา" (หน้า โพสต์ หมวดหมู่ tagline) จึงมีปัญหาข้อ **1, 2, 4, 8, 11** ติดมาในไฟล์ ข้อ **3** ผู้เรียนตั้งเองในขั้นที่ 1 ข้อ 7 (Tagline) ส่วนข้อ **5, 6, 7, 9, 10, 12** ขึ้นกับ theme/plugin/รูปที่ติดตั้งบนเครื่อง: ข้อ 6-7 เห็นทันทีเมื่อเปิด Rank Math + Astra ตามขั้นที่ 0 (Rank Math: Schema Type ค่าเริ่มต้น = Article ทุก post type, `og:site_name` และ Organization ใน `@graph` ยังเป็นชื่อเว็บเก่าจากตอนติดตั้ง WordPress หรือจาก Setup Wizard; Astra: microdata `itemtype` ซ้อนอีกชั้น); ข้อ 9-10 ผู้สอนสาธิตจากเว็บตัวอย่างบนเครื่องผู้สอน ผู้เรียนที่ต้องการทดลองเองให้อัปโหลดรูป JPEG ขนาดใหญ่ 1 รูปเป็น Featured Image และเปิด plugin ที่มีอยู่แล้วในเครื่องเพิ่ม 2-3 ตัว
 
 > 🧪 **ก่อนแก้อะไร ให้วัดค่าเริ่มต้นไว้ก่อน** (Workshop ท้ายวันจะเทียบก่อน-หลัง): เปิด `view-source:http://geniuscorp.test/` นับ `<h1`, นับ `application/ld+json`, ดูขนาดหน้า (DevTools → Network → Doc → Size) และรัน Query Monitor ดูจำนวน query กับเวลา (ยังไม่ต้องรัน PageSpeed เพราะเว็บอยู่ในเครื่อง จะวัดจริงตอน Deploy ใน Day 4 หรือใช้ Lighthouse ใน Chrome DevTools แทน)
 
@@ -179,9 +229,9 @@ HTML สมบูรณ์ส่งกลับ (ถ้ามี Page Cache: เ
 
 | #  | ข้อตรวจ                                                                     | วิธีตรวจ                                                    | ผ่านเมื่อ                                    | GeniusCorp WP (ก่อนแก้) |
 | -- | --------------------------------------------------------------------------- | ----------------------------------------------------------- | -------------------------------------------- | ----------------------- |
-| 1  | Title ไม่ซ้ำกัน ยาว ~50-60 ตัวอักษร ไม่ยัด keyword                             | View Source `<title>` 5 หน้าต่างประเภท / Rank Math → SEO Analysis | ทุกหน้าต่างกันและอ่านรู้เรื่อง             | ❌ ยาว 200+ ซ้ำทุกหน้า    |
+| 1  | Title ไม่ซ้ำกัน ยาว ~50-60 ตัวอักษร ไม่ยัด keyword                             | View Source `<title>` 5 หน้าต่างประเภท / Rank Math → SEO Analysis | ทุกหน้าต่างกันและอ่านรู้เรื่อง             | ❌ หน้าแรกยาว 120+ (Tagline), หน้าอื่นสั้นแต่ไม่บอกคุณค่า |
 | 2  | Meta description รายหน้าเขียนจริง ~150-160 ตัวอักษร                           | View Source `<meta name="description">`                     | ไม่ใช่ auto-generate/boilerplate             | ❌ ว่าง → auto           |
-| 3  | ไม่มี `<meta name="keywords">`                                               | View Source                                                 | ไม่พบ                                        | ❌ มี                    |
+| 3  | ไม่มี `<meta name="keywords">`                                               | View Source                                                 | ไม่พบ                                        | ✅ (Astra/Rank Math ไม่ใส่; เว็บเก่ามักมี) |
 | 4  | OG ครบ (type, title, description, image, url) และบทความมี `article:published_time` | View Source / Facebook Sharing Debugger                | ครบ                                          | 🟡 มีแต่ไม่มี published_time |
 
 **B. Canonical & URL (3 ข้อ)**
@@ -196,7 +246,7 @@ HTML สมบูรณ์ส่งกลับ (ถ้ามี Page Cache: เ
 
 | #  | ข้อตรวจ                                                        | วิธีตรวจ                                                     | ผ่านเมื่อ                       | ก่อนแก้ |
 | -- | -------------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------- | ------- |
-| 8  | H1 เดียวต่อหน้า ทุกหน้า รวมหน้าแรก                              | DevTools Console: `document.querySelectorAll('h1').length`   | = 1                             | ❌ 2 (หน้าเดี่ยว) / 0 (หน้าแรก) |
+| 8  | H1 เดียวต่อหน้า ทุกหน้า รวมหน้าแรก                              | DevTools Console: `document.querySelectorAll('h1').length`   | = 1                             | ❌ 2 (หน้าเดี่ยว) / 1 แต่เป็นโลโก้ (หน้าแรก) |
 | 9  | H2 คือหัวข้อหลัก การ์ด/รายการใช้ H3, ไม่ข้ามระดับ                | Extension "HeadingsMap" หรือ Console                          | โครงสร้างเป็นต้นไม้              | ❌ การ์ดเป็น H2 |
 | 10 | ย่อหน้าแรกของหน้าบริการ/บทความตอบคำถามหลักได้ทันที (Inverted Pyramid) | อ่านเอง                                                      | 2-3 ประโยคแรกสรุปครบ             | 🟡      |
 | 11 | ไม่มีเนื้อหาสำคัญที่โหลดด้วย AJAX/JS หลัง page load              | View Source แล้วค้นข้อความที่เห็นบนจอ                         | พบใน source ทั้งหมด              | ✅      |
@@ -205,7 +255,7 @@ HTML สมบูรณ์ส่งกลับ (ถ้ามี Page Cache: เ
 
 | #  | ข้อตรวจ                                                        | วิธีตรวจ                                    | ผ่านเมื่อ                                       | ก่อนแก้ |
 | -- | -------------------------------------------------------------- | ------------------------------------------- | ----------------------------------------------- | ------- |
-| 12 | มี JSON-LD ชุดเดียว (ไม่ซ้ำซ้อนจากหลายแหล่ง)                    | View Source นับ `application/ld+json` และดู `@type` | 1 block (หรือหลาย block ที่ไม่ซ้ำ type)   | ❌ 3 แหล่ง ขัดกัน |
+| 12 | มี JSON-LD ชุดเดียว (ไม่ซ้ำซ้อนจากหลายแหล่ง)                    | View Source นับ `application/ld+json` และดู `@type` | 1 block (หรือหลาย block ที่ไม่ซ้ำ type)   | ❌ 2 แหล่ง (Rank Math JSON-LD + Astra microdata) ขัดกัน |
 | 13 | Organization/LocalBusiness + WebSite ในหน้าแรก, ข้อมูลตรงกับหน้า Contact | validator.schema.org                   | 0 error, ชื่อ/เบอร์/ที่อยู่ตรง                    | 🟡 มีแต่ชื่อไม่ตรง |
 | 14 | Article + Person(author) + BreadcrumbList ในบทความ / Service + Offer ในหน้าบริการ | Rich Results Test              | type ถูกต้องตามประเภทหน้า                        | ❌ Article บนหน้าบริการ, ไม่มี Person |
 | 15 | FAQPage บนหน้าบริการ เนื้อหาตรงกับที่แสดง                       | Rich Results Test                           | มี และตรง                                        | ❌ ไม่มี |
@@ -288,11 +338,11 @@ Impact กลาง │ ทำเมื่อว่าง                       
 
 ### 3.1 สร้าง Child Theme ที่ปลอดภัยต่อการอัปเดต (ทำก่อนทุกอย่าง)
 
-GeniusCorp WP ใช้ Theme `geniuscorp-base` (Theme สมมติในคอร์ส ผู้เรียนที่ใช้ Theme อื่นเช่น Astra, GeneratePress, Kadence ทำเหมือนกันทุกประการ เปลี่ยนแค่ค่า `Template:`)
+GeniusCorp WP ใช้ Theme **Astra** เป็น parent (ติดตั้งไว้ในขั้นที่ 0) ผู้เรียนที่ทำกับเว็บจริงที่ใช้ GeneratePress, Kadence หรือ classic theme อื่น ทำเหมือนกันทุกประการ เปลี่ยนแค่ค่า `Template:` ให้ตรงกับชื่อโฟลเดอร์ของ parent (ถ้าเว็บจริงใช้ block theme เช่น Twenty Twenty-Five ต้องแปลง template เป็น block markup `.html` ซึ่งอยู่นอกขอบเขตคอร์สนี้)
 
 ```
 wp-content/themes/
-├── geniuscorp-base/          ← Parent (ห้ามแก้ไฟล์ในนี้ อัปเดตแล้วหาย)
+├── astra/                    ← Parent (ห้ามแก้ไฟล์ในนี้ อัปเดตแล้วหาย)
 └── geniuscorp-geo/           ← Child Theme ของเรา (สร้างใหม่)
     ├── style.css             ← header ประกาศ child theme
     ├── functions.php         ← โหลดไฟล์ใน inc/
@@ -315,11 +365,13 @@ wp-content/themes/
 /*
 Theme Name:  GeniusCorp GEO
 Description: Child theme สำหรับ GEO/AEO Retrofit - Schema, FAQ, Heading, Performance
-Template:    geniuscorp-base
+Template:    astra
 Version:     1.0.0
 Text Domain: geniuscorp-geo
 */
 ```
+
+> 📌 `Template:` ต้องตรงกับ **ชื่อโฟลเดอร์** ของ parent ใน `wp-content/themes/` (ตัวพิมพ์เล็ก) ไม่ใช่ชื่อที่แสดงในหน้า Themes ถ้าพิมพ์ผิด WordPress จะขึ้น "The parent theme is missing" และไม่ให้ Activate
 
 ```php
 <?php
@@ -331,10 +383,11 @@ define('GC_GEO_VERSION', '1.0.0');
 define('GC_GEO_DIR', get_stylesheet_directory());
 define('GC_GEO_URI', get_stylesheet_directory_uri());
 
-// โหลด CSS ของ parent แล้วตามด้วยของ child
+// โหลด CSS ของ parent แล้วตามด้วยของ child (ใช้ get_template() จึงไม่ต้องแก้เมื่อเปลี่ยน parent)
 add_action('wp_enqueue_scripts', function () {
-    wp_enqueue_style('geniuscorp-base', get_template_directory_uri() . '/style.css', [], wp_get_theme('geniuscorp-base')->get('Version'));
-    wp_enqueue_style('geniuscorp-geo', GC_GEO_URI . '/style.css', ['geniuscorp-base'], GC_GEO_VERSION);
+    $parent = wp_get_theme(get_template());
+    wp_enqueue_style('gc-parent-style', get_template_directory_uri() . '/style.css', [], $parent->get('Version'));
+    wp_enqueue_style('geniuscorp-geo', GC_GEO_URI . '/style.css', ['gc-parent-style'], GC_GEO_VERSION);
 });
 
 // แยกโค้ดเป็นไฟล์ตามหน้าที่ (ลำดับสำคัญ: post-types ต้องมาก่อน schema/faq)
@@ -353,7 +406,7 @@ foreach ([
 
 Appearance → Themes → Activate **GeniusCorp GEO** (Child) แล้วตรวจว่าเว็บยังแสดงผลเหมือนเดิม
 
-> ⚠️ **สำรอง (Backup) ก่อนเปิด Child Theme และก่อนแก้ทุกครั้ง:** Tools → Export หรือ All-in-One WP Migration → Export เป็นไฟล์ไว้ นิสัยนี้จะมีผลมากตอนทำกับเว็บจริงของลูกค้าใน Day 4
+> ⚠️ **สำรอง (Backup) ก่อนเปิด Child Theme และก่อนแก้ทุกครั้ง:** Tools → Export (.xml เฉพาะเนื้อหา) หรือติดตั้ง All-in-One WP Migration แล้ว Export (.wpress ทั้งเว็บ) เก็บเป็นไฟล์ไว้ นิสัยนี้จะมีผลมากตอนทำกับเว็บจริงของลูกค้าใน Day 4
 
 ### 3.2 ตั้งค่า Rank Math ให้ถูกหลัก
 
@@ -362,11 +415,13 @@ Appearance → Themes → Activate **GeniusCorp GEO** (Child) แล้วตร
 | ที่ตั้งค่า                     | ค่าเดิม (ปัญหา)                                                        | ค่าใหม่                                                     |
 | ------------------------------ | ---------------------------------------------------------------------- | ----------------------------------------------------------- |
 | Global Meta → Separator        | `-`                                                                    | `\|` (หรือคงเดิม ไม่สำคัญ)                                   |
-| Homepage → Title               | `%sitename% - บริษัทพัฒนาเว็บ แอป ซอฟต์แวร์ ERP CRM ...` (200+ ตัวอักษร) | `GeniusCorp - บริษัทพัฒนาซอฟต์แวร์และเว็บไซต์องค์กรที่ AI ค้นเจอ` |
+| Homepage → Title               | `%sitename% %page% %sep% %sitedesc%` (ค่าเริ่มต้น) → ได้ `GeniusCorp - บริษัทพัฒนาเว็บ แอป ซอฟต์แวร์ ERP CRM ... รับทำแอป` (120+ ตัวอักษร) | `GeniusCorp - บริษัทพัฒนาซอฟต์แวร์และเว็บไซต์องค์กรที่ AI ค้นเจอ` (พิมพ์ข้อความจริง ไม่ใช้ `%sitedesc%`) |
 | Homepage → Description         | (ว่าง)                                                                 | เขียนจริง 150-160 ตัวอักษร เหมือน `SITE.defaultDescription` ฝั่ง Astro |
-| Post Types → Posts → Title     | `%title% %sep% %sitename% %sep% บริษัทพัฒนาเว็บ...`                      | `%title% %sep% %sitename%`                                  |
+| Settings → General → Tagline   | ข้อความ keyword stuffing 100+ ตัวอักษร (ขั้นที่ 1 ข้อ 7)                  | ประโยคสั้น 40-60 ตัวอักษร เช่น `พัฒนาเว็บไซต์และซอฟต์แวร์องค์กร` (theme แสดง Tagline ใต้โลโก้/ footer และ Rank Math ใช้เป็น `WebSite.description`) |
+| Post Types → Posts → Title     | `%title% %sep% %sitename%` (ค่าเริ่มต้นถูกอยู่แล้ว - เว็บจริงมักถูกแก้เป็น `%title% %sep% %sitename% %sep% %sitedesc%`) | คง `%title% %sep% %sitename%` และตรวจว่าไม่มี `%sitedesc%` ต่อท้าย |
 | Post Types → Posts → Description | `%excerpt%` (ดึงย่อหน้าแรก)                                          | `%excerpt%` **แต่ต้องเขียน Excerpt จริงทุกโพสต์** (ดูด้านล่าง) |
 | Post Types → Pages → Title     | เหมือน Posts                                                           | `%title% %sep% %sitename%`                                  |
+| Titles & Meta → Local SEO (หรือ Setup Wizard) → Person or Company / Name | **Person** + ชื่อเว็บเก่าตอนติดตั้ง WordPress (ทำให้ `og:site_name` และ Organization ใน `@graph` ผิด) | **Company** ชื่อ `GeniusCorp` + โลโก้ 1200×630 (ใช้ชั่วคราวจนกว่าเราจะปิด Schema ของ Rank Math ใน Module 4 แต่ `og:site_name` ยังมาจากตรงนี้) |
 | Post Types → Services (CPT ใหม่ Module 5) → Title | -                                                    | `%title% %sep% %sitename%`                                  |
 | Post Types → Services → Schema Type | Article (ค่าเริ่มต้นผิด!)                                          | **None** (เราจะฉีด Service เอง)                              |
 | Post Types → Posts → Schema Type | Article                                                              | **None** (เราฉีดเองเพื่อควบคุม author/dates - Module 4) หรือคง Article ถ้าไม่เขียนเอง |
@@ -448,9 +503,13 @@ add_filter('rank_math/frontend/canonical', function (string $canonical): string 
 
 ### 3.4 ตรวจและแก้ Heading Hierarchy ที่ Theme/Page Builder สร้างผิด
 
-**ปัญหา 1 - โลโก้เป็น `<h1>` ทุกหน้า:** Theme ส่วนใหญ่ใส่ `<h1 class="site-title">` ใน header.php ให้ทุกหน้า วิธีแก้มี 2 ระดับ:
+**ปัญหา 1 - H1 ซ้ำ 2 ตัวในหน้าบริการ:** มี 2 ชั้นที่ต้องดู
 
-ระดับ filter (ถ้า theme มี filter ให้ เช่น Astra: `astra_site_title_tag`, GeneratePress: `generate_site_title_output`):
+ชั้นที่ 1 - `<h1>` ในเนื้อหา: เปิด `view-source:/web-development/` จะเห็น `<h1 class="entry-title">` ของ Astra แล้วตามด้วย `<h1>รับพัฒนาเว็บไซต์องค์กร</h1>` ที่อยู่ในตัวเนื้อหา (คนเขียนใส่ block Heading ระดับ H1 เอง พบบ่อยมากในเว็บจริง) วิธีแก้คือแก้ที่เนื้อหา ไม่ใช่โค้ด: Pages → แก้ไขหน้าบริการทั้ง 3 หน้า → คลิก block Heading นั้น → เปลี่ยนระดับเป็น **H2** หรือลบทิ้ง (เพราะ theme ใส่ชื่อเรื่องเป็น H1 ให้แล้ว) → Update · และตอนย้ายไป CPT `service` ในการบ้าน อย่าคัดลอก H1 ติดไปด้วย
+
+ชั้นที่ 2 - โลโก้เป็น `<h1>`: Astra ทำถูกอยู่แล้ว (โลโก้เป็น `<h1>` เฉพาะหน้าแรก หน้าอื่นเป็น `<span class="site-title">`) แต่ theme จำนวนมากใส่ `<h1 class="site-title">` ใน header.php ให้ทุกหน้า เราจึงใส่ filter ไว้ใน Child Theme เผื่อไว้ทุกกรณี วิธีแก้มี 2 ระดับ:
+
+ระดับ filter (ถ้า theme มี filter ให้ เช่น Astra: `astra_site_title_tag`, GeneratePress: `generate_site_title_output`, Kadence: `kadence_site_title_tag`):
 
 ```php
 <?php
@@ -459,10 +518,23 @@ add_filter('rank_math/frontend/canonical', function (string $canonical): string 
 defined('ABSPATH') || exit;
 
 /**
- * โลโก้/ชื่อเว็บใน header ต้องเป็น <p> หรือ <div> ไม่ใช่ <h1> (ยกเว้นหน้าแรกถ้า theme ไม่มี H1 อื่น)
- * ตัวอย่างสำหรับ theme ที่มี filter ชื่อ 'geniuscorp_base_site_title_tag'
+ * โลโก้/ชื่อเว็บใน header ต้องเป็น <p> ไม่ใช่ <h1> (ยกเว้นหน้าแรก ถ้าหน้าแรกไม่มี H1 อื่น)
  */
-add_filter('geniuscorp_base_site_title_tag', fn () => is_front_page() ? 'h1' : 'p');
+$gc_site_title_tag = fn () => is_front_page() ? 'h1' : 'p';
+
+// Astra (parent ของคอร์ส)
+add_filter('astra_site_title_tag', $gc_site_title_tag);
+
+// GeneratePress (ไม่มี tag filter ใช้ output filter แทน)
+add_filter('generate_site_title_output', function (string $output): string {
+    if (is_front_page()) {
+        return $output;
+    }
+    return str_replace(['<h1', '</h1>'], ['<p', '</p>'], $output);
+});
+
+// Kadence
+add_filter('kadence_site_title_tag', $gc_site_title_tag);
 ```
 
 ระดับ template override (ถ้า theme ไม่มี filter): คัดลอก `header.php` จาก parent มาไว้ใน child แล้วแก้:
@@ -475,7 +547,7 @@ add_filter('geniuscorp_base_site_title_tag', fn () => is_front_page() ? 'h1' : '
 </<?php echo $tag; ?>>
 ```
 
-**ปัญหา 2 - หน้าแรกไม่มี H1 เพราะ Page Builder ทำ heading เป็น `<span>`/`<div>`:** แก้ที่ widget heading ของ builder เลือก HTML tag = H1 สำหรับ hero heading (ทำครั้งเดียวที่หน้าแรก) หรือถ้าโลโก้เป็น H1 ในหน้าแรกอยู่แล้ว (จาก filter ด้านบน) ก็ผ่านข้อ 8 แล้ว
+**ปัญหา 2 - หน้าแรกไม่มี H1 ในเนื้อหา เพราะ hero เป็น `<div>` (หรือ Page Builder ทำ heading เป็น `<span>`):** ใน Demo หน้าแรกมี H1 อยู่ตัวเดียวคือโลโก้ "GeniusCorp" (Astra ใส่ให้ในหน้าแรก) ซึ่งผ่านเกณฑ์ "มี H1" ในเชิงเทคนิค แต่ไม่ได้บอก AI ว่าเว็บนี้ทำอะไร ทางที่ดีกว่าคือ Pages → แก้ไข "หน้าแรก" → เปลี่ยน `<div class="hero-title">พัฒนาเว็บไซต์และซอฟต์แวร์องค์กรครบวงจร</div>` เป็น block Heading ระดับ **H1** (ใน Code editor แก้ `div` เป็น `h1` ได้เลย) (ถ้าใช้ Page Builder แก้ที่ widget heading → HTML tag = H1) แล้วให้โลโก้เป็น `<p>` ทุกหน้ารวมหน้าแรก โดยแก้บรรทัดใน `geo-headings.php` เป็น `$gc_site_title_tag = fn () => 'p';` (เลือกได้ทั้ง 2 แบบ แต่ห้ามมี H1 สองตัวในหน้าแรก)
 
 **ปัญหา 3 - การ์ดเป็น `<h2>` 8 ตัวในหน้ารวมบริการ:** ถ้าหน้ารวมสร้างด้วย loop ของ theme (archive template) แก้ที่ template ครั้งเดียว:
 
@@ -560,9 +632,10 @@ add_action('rank_math/opengraph/facebook', function ($og) {
 
 defined('ABSPATH') || exit;
 
-// ลบ meta keywords ที่ theme เก่าใส่ไว้ (Rank Math ไม่ใส่อยู่แล้ว)
+// ตัวอย่าง: ลบ meta keywords ที่ theme เก่า/plugin เก่าใส่ไว้ (Astra และ Rank Math ไม่ใส่อยู่แล้ว)
+// ชื่อ callback ดูจาก Query Monitor → Hooks & Actions → wp_head แล้วแก้ให้ตรงกับเว็บจริง
 add_action('init', function () {
-    remove_action('wp_head', 'geniuscorp_base_meta_keywords');   // ชื่อ callback ดูจาก Query Monitor → Hooks → wp_head
+    remove_action('wp_head', 'my_old_theme_meta_keywords');
 });
 
 // ลด noise ใน <head> ที่ไม่มีประโยชน์กับผู้ใช้/AI และเพิ่ม request
@@ -596,13 +669,13 @@ add_filter('xmlrpc_enabled', '__return_false');
 
 ### 4.1 De-duplicate Schema: ตรวจว่าใครออก Schema อยู่บ้าง
 
-View Source หน้าบริการของ GeniusCorp WP ก่อนแก้ พบ `application/ld+json` 3 block:
+View Source หน้าบริการของ GeniusCorp WP ก่อนแก้ (Astra + Rank Math) พบ Schema จาก 2 แหล่งซ้อนกัน และถ้าเว็บจริงมี Page Builder จะมีแหล่งที่ 3:
 
-| แหล่ง                | @type ที่ออก                                       | ปัญหา                                                     | วิธีปิด                                                              |
+| แหล่ง                | รูปแบบ / @type ที่ออก                              | ปัญหา                                                     | วิธีปิด                                                              |
 | -------------------- | -------------------------------------------------- | --------------------------------------------------------- | -------------------------------------------------------------------- |
-| Rank Math            | `@graph`: Organization, WebSite, WebPage, **Article** (บนหน้าบริการ), BreadcrumbList, Person(author) | Article ผิดประเภทบนหน้าบริการ; Organization ใช้ชื่อจากหน้าตั้งค่าที่ไม่ตรง Contact | ตั้ง Schema Type = None ต่อ post type, หรือ filter `rank_math/json_ld` ตัด key ที่ไม่ต้องการ |
-| Theme (parent)       | Organization (ชื่อ/เบอร์ hardcode ใน theme options) | ซ้ำและขัดกับ Rank Math                                   | `remove_action('wp_head', ...)` ผ่าน Query Monitor หา callback       |
-| Page Builder         | WebPage + ImageObject ทุกรูป                        | WebPage 2 ตัว `@id` ต่างกัน                               | ปิดในหน้าตั้งค่า builder (Settings → Features → Schema/Structured Data) หรือ filter |
+| Rank Math            | JSON-LD 1 block `@graph`: Person/Organization (ชื่อเก่า "MyWPSite"), WebSite, WebPage, **Article** (บนหน้าบริการ), Person(author "admin" ไม่มี jobTitle) | Article ผิดประเภทบนหน้าบริการ; ชื่อองค์กรมาจาก Setup Wizard ไม่ตรงกับชื่อเว็บ | ตั้ง Schema Type = None ต่อ post type, หรือ filter `rank_math/json_ld` ตัด key ที่ไม่ต้องการ |
+| Theme Astra          | **microdata** ในแท็ก HTML (`itemscope itemtype="https://schema.org/..."` บน header, โลโก้, บทความ; ค้นหา `itemtype` ใน View Source) | เป็น Schema อีกภาษาหนึ่งที่ขัดกับ JSON-LD (ชื่อ/ประเภทไม่ตรงกัน) และเพิ่มขนาด HTML | `add_filter('astra_schema_enabled', '__return_false')` · theme อื่น: `remove_action('wp_head', ...)` โดยหา callback จาก Query Monitor |
+| Page Builder (ถ้ามี) | JSON-LD WebPage + ImageObject ทุกรูป               | WebPage 2 ตัว `@id` ต่างกัน                               | ปิดในหน้าตั้งค่า builder (Settings → Features → Schema/Structured Data) หรือ filter |
 
 **กลยุทธ์ที่เลือกในคอร์ส:** ปิดทั้งหมดแล้วเขียนเองชุดเดียว (เหมือนฝั่ง Astro 100%) เหตุผลคือควบคุมได้ ทดสอบได้ และย้ายไป Astro ในอนาคตได้โดย logic ไม่เปลี่ยน ทางเลือกอื่นคือให้ Rank Math ออก Organization/WebSite/Breadcrumb แล้วเราเสริมเฉพาะ Service/FAQ ก็ทำได้ แต่ต้องระวังไม่ให้ `@id` ชนกัน
 
@@ -627,11 +700,14 @@ add_filter('rank_math/json_ld', function (array $data, $jsonld): array {
  */
 
 /**
- * 2) Theme: ปิด Organization ของ parent theme
- *    ชื่อ callback ดูจาก Query Monitor → Hooks & Actions → wp_head
+ * 2) Theme: ปิด Schema ของ parent theme
+ *    Astra ออกเป็น microdata (itemtype/itemprop) มี filter ปิดให้
+ *    theme อื่นที่ echo JSON-LD ผ่าน wp_head ให้หา callback จาก Query Monitor → Hooks & Actions → wp_head
  */
+add_filter('astra_schema_enabled', '__return_false');
+
 add_action('init', function () {
-    remove_action('wp_head', 'geniuscorp_base_organization_schema', 5);
+    // ตัวอย่างสำหรับ theme อื่น: remove_action('wp_head', 'my_theme_organization_schema', 5);
 });
 
 /**
@@ -1119,7 +1195,7 @@ add_action('wp_head', function () {
 2. คัดลอก JSON → validator.schema.org → 0 errors; @type ต้องมี Organization, WebPage, Service, BreadcrumbList (FAQPage หลัง Module 5)
 3. หน้าบทความ → Article + Person + BreadcrumbList; ตรวจ dateModified = วันที่แก้ล่าสุดจริง (+07:00)
 4. หน้าแรก → Organization + WebSite(SearchAction) + WebPage
-5. หน้า author (/author/gcadmin/) → ProfilePage + Person - ให้ทีมกรอก Biographical Info + job_title ให้ครบ
+5. หน้า author (`/author/<username ของคุณ>/` เช่น `/author/admin/`) → ProfilePage + Person - ให้ทีมกรอก Biographical Info + job_title ให้ครบ
 ```
 
 > ⛔ **ถ้า JSON-LD ไม่ปรากฏ:** (1) Page Cache/Object Cache ยังเปิดอยู่ → ล้าง cache หรือปิดชั่วคราว (2) Theme parent ไม่เรียก `wp_head()` ใน header.php (พบใน theme ที่เขียนเองบางตัว) (3) มี fatal error ใน geo-schema.php → เปิด `WP_DEBUG` ใน wp-config.php ดู error · **ถ้า validator บอก JSON พัง:** มักเป็น `false` จาก `wp_json_encode` เพราะข้อมูลไม่ใช่ UTF-8 → หา post ที่มีปัญหาด้วยการ `var_dump(json_last_error_msg())`
@@ -1522,10 +1598,10 @@ add_filter('wp_get_attachment_image_attributes', function (array $attr, $attachm
 
 | ตัวชี้วัด                              | ก่อน (จากช่วง 20:30) | หลัง Module 3-6 | เครื่องมือ                     |
 | -------------------------------------- | -------------------- | --------------- | ------------------------------ |
-| จำนวน `<h1>` หน้าบริการ / หน้าแรก       | 2 / 0                |                 | Console                        |
-| ความยาว `<title>` หน้าแรก               | 200+                 |                 | View Source                    |
+| จำนวน `<h1>` หน้าบริการ / หน้าแรก       | 2 / 1 (โลโก้)         |                 | Console                        |
+| ความยาว `<title>` หน้าแรก               | 120+                 |                 | View Source                    |
 | meta description หน้าบทความ            | auto/boilerplate     |                 | View Source                    |
-| จำนวน `application/ld+json` หน้าบริการ  | 3 (ขัดกัน)            |                 | View Source                    |
+| จำนวน `application/ld+json` หน้าบริการ  | 1 (Article ผิด) + microdata ของ Astra |   | View Source                    |
 | @type ในหน้าบริการ                      | Article (ผิด)         |                 | validator.schema.org           |
 | FAQPage                                | ไม่มี                 |                 | Rich Results Test              |
 | canonical `/blog/page/2/`               | ชี้หน้าแรก             |                 | View Source                    |
@@ -1565,7 +1641,7 @@ add_filter('wp_get_attachment_image_attributes', function (array $attr, $attachm
 2. ย้าย 3 บริการเป็น CPT `service` + ใส่ราคา/ระยะเวลา/FAQ ครบ + ตั้ง 301 จาก URL เดิม
 3. กรอกโปรไฟล์ผู้เขียน (Users → Profile: Biographical Info, Website, ACF job_title/social_links) ให้ครบ เพราะ Day 4 จะทำ Author Box จากข้อมูลนี้
 4. ลด plugin ให้เหลือ ≤ 10 และจดว่าลบอะไรไปบ้าง
-5. Export เว็บ (All-in-One WP Migration) เก็บไว้เป็น snapshot "หลัง Retrofit" สำหรับ Deploy ใน Day 4
+5. Export เว็บเก็บไว้เป็น snapshot "หลัง Retrofit" สำหรับ Deploy ใน Day 4: ถ้าต้องการย้ายทั้งเว็บ (รวม theme/plugin/รูป) ให้ติดตั้ง All-in-One WP Migration แล้ว Export เป็น `.wpress` ถ้าต้องการเฉพาะเนื้อหาให้ใช้ Tools → Export (.xml)
 
 ---
 

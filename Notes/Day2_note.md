@@ -20,7 +20,7 @@
 7. สร้างระบบ FAQ จาก MySQL → Laravel API → FaqSection บนหน้าบริการ พร้อม FAQPage Schema อัตโนมัติ และเขียน FAQ แบบ answer-ready
 8. ตรวจ Structured Data ด้วย validator.schema.org และ Google Rich Results Test และทำให้ Validation เป็นส่วนหนึ่งของ workflow ก่อน Deploy (Workshop Day 2)
 
-> **หมายเหตุ:** วันนี้ต่อยอดจากโปรเจกต์ `geniuscorp-api` และ `geniuscorp-web` ของ Day 1 โดยตรง ผู้ที่ทำ Workshop Day 1 ไม่ทัน ให้ใช้ Starter Code `geniuscorp-day2-start.zip` ที่ส่งในกลุ่มไลน์ ซึ่งคือผลลัพธ์สมบูรณ์ของ Day 1
+> **หมายเหตุ:** วันนี้ต่อยอดจากโปรเจกต์ `geniuscorp-api` และ `geniuscorp-web` ของ Day 1 โดยตรง ผู้ที่ทำ Workshop Day 1 ไม่ทัน ให้ใช้โค้ดเฉลย `Code/geniuscorp-Day1-solution.zip` (โฟลเดอร์ `Code/Day1/`) ซึ่งคือผลลัพธ์สมบูรณ์ของ Day 1 ตามขั้นตอนใน `Code/Day1/README.md`
 >
 > กติกาการเขียนโค้ด: **TypeScript / JavaScript ไม่ใส่ semicolon** ส่วน **PHP ใส่ semicolon ตามปกติ**
 
@@ -1672,8 +1672,8 @@ geniuscorp-web/
 > ให้แน่ใจว่า:
 >
 > - `npm run build` ของ GeniusCorp Modern ผ่าน GEO check ครบ (นี่คือ "เป้าหมาย" ที่เราจะทำให้ WordPress ไปถึงใน Day 3)
-> - เว็บ WordPress ในเครื่อง (`geniuscorp.test` หรือเทียบเท่า) เข้า `/wp-admin` ได้ ติดตั้ง **Rank Math** (หรือ Yoast) และ **ACF** แล้ว เปิดใช้งาน 2 ตัวนี้ ส่วน Query Monitor และ LiteSpeed Cache ติดตั้งไว้แต่**ยังไม่เปิด**
-> - ดาวน์โหลด `geniuscorp-wp-demo.wpress` (เว็บตัวอย่างที่มีปัญหา GEO) และติดตั้ง plugin **All-in-One WP Migration** ไว้สำหรับ Import (จะ Import พร้อมกันในคลาส)
+> - เว็บ WordPress ในเครื่อง (`geniuscorp.test` หรือเทียบเท่า) เข้า `/wp-admin` ได้ ติดตั้งและ **เปิดใช้ theme Astra** (ฟรี ค้นจาก Appearance → Themes → Add New) แทน Twenty Twenty-Five เพราะ Child Theme ที่จะเขียนใน Day 3 เป็น classic theme ไม่รองรับ block theme · ติดตั้ง **Rank Math** (หรือ Yoast) และ **ACF** แล้ว เปิดใช้งาน 2 ตัวนี้ ส่วน Query Monitor และ LiteSpeed Cache ติดตั้งไว้แต่**ยังไม่เปิด**
+> - ดาวน์โหลด `geniuscorp-wp-demo.xml` (เว็บตัวอย่างที่มีปัญหา GEO) จากโฟลเดอร์โค้ดเฉลย `Code/Day3/geniuscorp-wp/demo-site/` (หรือใน `geniuscorp-Day3-solution.zip`) วางไว้ในเครื่อง Import ผ่าน Tools → Import → WordPress ได้เลย ไม่ต้องติดตั้ง plugin เสริม (จะ Import พร้อมกันในคลาส)
 > - ทบทวน schema.ts วันนี้ให้เข้าใจ เพราะ Day 3 เราจะเขียน "สิ่งเดียวกัน" ด้วย PHP ใน functions.php
 > - (แนะนำ) อ่าน "Structured data general guidelines" ของ Google โดยเฉพาะหัวข้อ Quality guidelines เรื่องเนื้อหาต้องตรงกับที่แสดง
 

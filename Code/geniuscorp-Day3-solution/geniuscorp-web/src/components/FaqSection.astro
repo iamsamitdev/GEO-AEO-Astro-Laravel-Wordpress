@@ -1,0 +1,38 @@
+---
+// แสดง FAQ ที่มองเห็นได้ (เนื้อหาตรงกับ FAQPage Schema ที่หน้าประกอบไว้ใน head)
+import type { Faq } from '../lib/types'
+
+interface Props {
+  faqs: Faq[]
+  heading?: string
+}
+
+const { faqs, heading = 'คำถามที่พบบ่อย' } = Astro.props
+---
+
+{faqs.length > 0 && (
+  <section class="faq" aria-labelledby="faq-heading">
+    <h2 id="faq-heading">{heading}</h2>
+    {faqs.map((faq, index) => (
+      <details class="faq-item" open={index === 0}>
+        <summary>
+          <h3>{faq.question}</h3>
+        </summary>
+        <div class="faq-answer">
+          <p>{faq.answer}</p>
+        </div>
+      </details>
+    ))}
+  </section>
+)}
+
+<style>
+  .faq { margin-top: 3rem; max-width: 760px; }
+  .faq-item { border: 1px solid #dde4ec; border-radius: 10px; margin-bottom: .75rem; padding: 0 1rem; background: #fff; }
+  .faq-item summary { cursor: pointer; padding: .9rem 0; list-style: none; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary h3 { display: inline; font-size: 1.05rem; margin: 0; }
+  .faq-item summary::before { content: '+'; display: inline-block; width: 1.5rem; font-weight: 700; color: #1855a3; }
+  .faq-item[open] summary::before { content: '−'; }
+  .faq-answer { padding: 0 0 1rem 1.5rem; color: #4a5a78; line-height: 1.7; }
+</style>

@@ -38,7 +38,7 @@
 | 22:35-23:05 | **Module 4** Astro Fundamentals for SSG (โครงสร้าง, Layout, ดึง API, getStaticPaths)       |
 | 23:05-23:30 | **Workshop Day 1** ประกอบเว็บ GeniusCorp Modern ครบเมนูหลัก + `astro build`                 |
 
-> ⏱️ เวลา 3 ชั่วโมงค่อนข้างจำกัด ผู้สอนจะ "พาทำ" ส่วนที่เป็นแก่นในคลาส ส่วนไฟล์ที่เป็น boilerplate (Seeder ข้อมูลจำลอง, CSS, หน้า static เช่น Contact) มีให้ใน **Starter Code** ที่ส่งในกลุ่มไลน์ล่วงหน้า ผู้เรียนที่พิมพ์ตามไม่ทันให้ใช้ Starter Code แล้วตามเนื้อหาต่อได้ทันที เอกสารฉบับนี้มีโค้ดครบทุกไฟล์หลักเพื่อให้ทบทวนย้อนหลังได้เอง
+> ⏱️ เวลา 3 ชั่วโมงค่อนข้างจำกัด ผู้สอนจะ "พาทำ" ส่วนที่เป็นแก่นในคลาส ส่วนไฟล์ที่เป็น boilerplate (Seeder ข้อมูลจำลอง, CSS, หน้า static เช่น Contact) มีให้ใน **โค้ดเฉลย** (`Code/geniuscorp-Day1-solution.zip`) ที่ส่งในกลุ่มไลน์ล่วงหน้า ผู้เรียนที่พิมพ์ตามไม่ทันให้ใช้โค้ดเฉลยแล้วตามเนื้อหาต่อได้ทันที เอกสารฉบับนี้มีโค้ดครบทุกไฟล์หลักเพื่อให้ทบทวนย้อนหลังได้เอง
 
 ---
 
@@ -60,14 +60,18 @@ mysql --version # MySQL 8 หรือ MariaDB 10.6 ขึ้นไป
 
 > ⚠️ **Node.js เลขคี่ (v23, v25) ใช้กับ Astro 6 ไม่ได้** ถ้าเผลอติดตั้งไว้ ให้ถอนออกแล้วลง LTS เลขคู่ใหม่ก่อน มิฉะนั้น `npm create astro` จะพังทันที รายละเอียดการติดตั้งทั้งหมดอยู่ในเอกสาร **precourse (เตรียมเครื่องก่อนเข้าอบรม)** ที่ส่งให้ก่อนหน้านี้ ถ้ารันสคริปต์ตรวจในส่วน D1 ของเอกสารนั้นผ่านครบ 5 บรรทัด ถือว่าพร้อม
 
-**สิ่งที่สถาบันเตรียมให้ (ส่งในกลุ่มไลน์ก่อนวันเรียน 1 วัน)**
+**สิ่งที่สถาบันเตรียมให้ (ส่งในกลุ่มไลน์ก่อนวันเรียน 1 วัน)** - ทั้งหมดอยู่ในโฟลเดอร์ `Code/` คู่กับเอกสารชุดนี้ และแยกเป็น zip รายวัน
 
-| ไฟล์                          | ใช้เมื่อ                    | เนื้อหา                                                                     |
-| ----------------------------- | --------------------------- | --------------------------------------------------------------------------- |
-| `geniuscorp-api-starter.zip`  | Day 1 Module 3              | โปรเจกต์ Laravel 13 พร้อม Seeder ข้อมูลจำลอง (บริการ ผลงาน บทความ ทีมงาน FAQ) |
-| `geniuscorp-web-starter.zip`  | Day 1 Module 4 / Workshop   | โปรเจกต์ Astro 6 พร้อม CSS พื้นฐานและหน้า static                             |
-| `geniuscorp-wp-demo.wpress`   | Day 3                       | เว็บ WordPress ตัวอย่างที่ "มีปัญหา GEO ครบชุด" สำหรับทำ Retrofit             |
-| `geo-ready-checklist.md`      | Day 3-4                     | Checklist ฉบับ Astro และฉบับ WordPress                                       |
+| ไฟล์                                | ใช้เมื่อ                  | เนื้อหา                                                                                                   |
+| ----------------------------------- | ------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `Code/geniuscorp-Day1-solution.zip` | Day 1 (ทำไม่ทัน / ทบทวน) | โค้ดเฉลย ณ สิ้นวันที่ 1: `geniuscorp-api/` (Laravel 13 เฉพาะไฟล์ที่เขียนเอง + Seeder ข้อมูลจำลอง) และ `geniuscorp-web/` (Astro 6 ครบ + `global.css`) |
+| `Code/geniuscorp-Day2-solution.zip` | Day 2                     | Day 1 + GEO Layer (SeoHead, JsonLd, schema.ts, FAQ, check-geo.mjs)                                        |
+| `Code/geniuscorp-Day3-solution.zip` | Day 3                     | Day 2 + `geniuscorp-wp/` = Child Theme `geniuscorp-geo` และ **Demo Site `demo-site/geniuscorp-wp-demo.xml`** (เว็บ WordPress ตัวอย่างที่ "มีปัญหา GEO" Import ผ่าน Tools → Import) |
+| `Code/geniuscorp-Day4-solution.zip` | Day 4                     | Day 3 + Author Box, sitemap/llms.txt/robots.txt, `deploy/`, Webhook Rebuild                                |
+| `Code/README.md` และ `Code/DayN/README.md` | ทุกวัน               | ขั้นตอนติดตั้งและรายการไฟล์ที่เพิ่มในแต่ละวัน                                                                |
+| GEO-Ready Checklist                 | Day 3-4                   | อยู่ใน `Day3_note.md` (Audit 20 ข้อ) และ `Day4_note.md` Module 6.4 (ฉบับสมบูรณ์ 30 ข้อ)                     |
+
+> 📌 โค้ดเฉลยเป็น **snapshot สะสม**: `DayN` = ทุกอย่างของ `Day(N-1)` + สิ่งที่เพิ่มในวันนั้น ผู้เรียนที่ทำ Workshop ไม่ทัน ให้แตก zip ของวันถัดไปแล้วเรียนต่อได้ทันที (วิธีวางไฟล์ Laravel ทับ `laravel new` อยู่ใน `Code/Day1/README.md`)
 
 ---
 
@@ -918,7 +922,7 @@ class Faq extends Model
 
 ### 3.5 Seeder ข้อมูลจำลอง GeniusCorp
 
-ข้อมูลจำลองถูกออกแบบให้ "มีตัวเลข" และ "ตอบคำถามจริง" ตั้งแต่ต้น (ราคาเริ่มต้น ระยะเวลา จำนวนโปรเจกต์) เพราะเราจะเห็นผลของมันใน JSON-LD และ FAQ ในวันพรุ่งนี้ ไฟล์เต็มอยู่ใน Starter Code ด้านล่างคือฉบับย่อที่แสดงโครงสร้างครบทุกตาราง
+ข้อมูลจำลองถูกออกแบบให้ "มีตัวเลข" และ "ตอบคำถามจริง" ตั้งแต่ต้น (ราคาเริ่มต้น ระยะเวลา จำนวนโปรเจกต์) เพราะเราจะเห็นผลของมันใน JSON-LD และ FAQ ในวันพรุ่งนี้ ไฟล์เต็มอยู่ในโค้ดเฉลย `Code/Day1/geniuscorp-api/database/seeders/` ด้านล่างคือฉบับย่อที่แสดงโครงสร้างครบทุกตาราง
 
 ```php
 <?php
@@ -1751,7 +1755,7 @@ geniuscorp-web/
 │   │   ├── ArticleCard.astro
 │   │   └── PortfolioCard.astro
 │   ├── styles/
-│   │   └── global.css          ← CSS พื้นฐาน (มีใน Starter Code)
+│   │   └── global.css          ← CSS พื้นฐาน (มีในโค้ดเฉลย Code/Day1/geniuscorp-web/src/styles/)
 │   └── pages/                  ← ทุกไฟล์ในนี้ = 1 หน้าเว็บ (file-based routing)
 │       ├── index.astro         ← /
 │       ├── about.astro         ← /about/

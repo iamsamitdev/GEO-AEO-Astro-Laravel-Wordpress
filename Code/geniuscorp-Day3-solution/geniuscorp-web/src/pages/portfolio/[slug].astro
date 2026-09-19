@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import JsonLd from '../../components/JsonLd.astro'
+import Breadcrumb from '../../components/Breadcrumb.astro'
+import { getPortfolios } from '../../lib/api'
+import { graph, organizationSchema, webPageSchema, portfolioSchema, breadcrumbSchema } from '../../lib/schema'
+import type { Portfolio } from '../../lib/types'
+
+export async function getStaticPaths() {
+  const portfolios = await getPortfolios()
+  return portfolios.map((item) => ({ params: { slug: item.slug }, props: { item } }))
+}
+
+interface Props {
+  item: Portfolio
+}
+
+const { item } = Astro.props
+const crumbs = [
+  { name: 'หน้าแรก', url: '/' },
+  { name: 'ผลงาน', url: '/portfolio/' },
+  { name: item.title },
+]
+
+const jsonLd = graph(
+  organizationSchema(),
+  webPageSchema({ url: item.url, name: item.title, description: item.summary, dateModified: item.updated_at }),
+  portfolioSchema(item),
+  breadcrumbSchema(crumbs),
+)
+---
+
+<BaseLayout seo={{ title: item.title, description: item.summary, canonical: item.url, ogImage: item.cover_image ?? undefined }}>
+  <JsonLd slot="head" data={jsonLd} />
+  <article class="container prose">
+    <Breadcrumb crumbs={crumbs} />
+    <h1>{item.title}</h1>
+    {item.client_name && <p class="meta">ลูกค้า: {item.client_name}</p>}
+    {item.completed_at && (
+      <p class="meta">ส่งมอบเมื่อ <time datetime={item.completed_at}>{item.completed_at}</time></p>
+    )}
+    <p class="lead">{item.summary}</p>
+    {item.description && <div set:html={item.description} />}
+  </article>
+</BaseLayout>
