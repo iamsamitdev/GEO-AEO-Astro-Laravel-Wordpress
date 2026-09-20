@@ -1515,6 +1515,90 @@ WantedBy=multi-user.target
 
 ---
 
+### 5.8 ทางเลือกสำหรับคอร์สและเดโม: Deploy บน Render (ฟรี) ด้วย Docker + SQLite
+
+ไม่ใช่ทุกคนมีเซิร์ฟเวอร์ของตัวเองตอนเรียน หัวข้อนี้คือเส้นทางที่ใช้เงิน 0 บาท และยังสอนหลักการเดิมได้ครบ โดยต้องเข้าใจข้อแลกเปลี่ยนก่อน
+
+| ระบบ | ที่อยู่ | เหตุผล |
+| --- | --- | --- |
+| Astro | Render **Static Site** (ฟรี) | ไฟล์ static ไม่หลับ วัด TTFB ได้จริง และ AI crawler เข้าถึงได้ตลอด |
+| Laravel API | Render **Web Service** (ฟรี) + Docker + **SQLite** | แผนฟรีไม่มี MySQL ให้ใช้ และ API ของเราเป็นงานอ่านอย่างเดียว |
+| WordPress | **ในเครื่องเท่านั้น** | แผนฟรีไม่มี persistent disk และไม่มี MySQL ทำให้รูป/plugin/ฐานข้อมูลหายทุกครั้งที่ container เกิดใหม่ |
+
+**ข้อจำกัดของแผนฟรีที่ต้องรู้** (จาก render.com/docs/free)
+
+1. Web service หลับหลังไม่มี traffic 15 นาที ตื่นใช้เวลาราว 1 นาที
+2. Filesystem เป็น **ephemeral** ไฟล์ SQLite หายทุกครั้งที่ deploy / restart / ตื่น
+3. ไม่มี Shell และไม่มี one-off jobs จึงรัน `php artisan migrate` จากหน้า Dashboard ไม่ได้
+4. Background Worker และ Cron Job ไม่มีแผนฟรี
+5. ขณะที่ web service หลับ Render ตอบ `/robots.txt` เป็น `Disallow: /` อัตโนมัติ **นี่คือเหตุผลที่เว็บหลักต้องเป็น Static Site ไม่ใช่ Web Service**
+
+**วิธีรับมือทั้ง 5 ข้อ** (ไฟล์อยู่ในโค้ดเฉลย Day 4)
+
+```dockerfile
+# geniuscorp-api/Dockerfile (ย่อ)
+FROM php:8.3-cli-alpine
+RUN docker-php-ext-install pdo_sqlite pdo_mysql bcmath intl zip opcache
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+WORKDIR /var/www/html
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
+COPY . .
+RUN composer dump-autoload --optimize --no-dev
+ENV PHP_CLI_SERVER_WORKERS=4
+ENTRYPOINT ["./docker-entrypoint.sh"]
+```
+
+```sh
+#!/bin/sh
+# geniuscorp-api/docker-entrypoint.sh - ข้อ 2 และ 3: สร้างฐานข้อมูลใหม่ทุกครั้งที่บูต
+set -e
+: "${DB_CONNECTION:=sqlite}"
+: "${PORT:=10000}"
+
+if [ "$DB_CONNECTION" = "sqlite" ]; then
+  DB_PATH="${DB_DATABASE:-/var/www/html/database/database.sqlite}"
+  mkdir -p "$(dirname "$DB_PATH")" && touch "$DB_PATH"
+fi
+
+php artisan migrate --force --no-interaction
+[ "${SEED_ON_BOOT:-false}" = "true" ] && php artisan db:seed --force --no-interaction
+
+# Sanctum token อยู่ในฐานข้อมูล เมื่อ DB ถูกสร้างใหม่ token เดิมจะหาย
+# จึงออก token จากค่าคงที่ใน env ทุกครั้ง (ค่าเดียวกับ API_TOKEN ฝั่ง Astro)
+[ -n "${BUILD_TOKEN:-}" ] && php artisan geo:issue-build-token --token="$BUILD_TOKEN" --no-interaction
+
+php artisan config:cache && php artisan route:cache
+exec php artisan serve --host 0.0.0.0 --port "$PORT"
+```
+
+> 📌 **ทำไมต้องออก token ซ้ำจาก env:** ถ้าปล่อยให้ `geo:issue-build-token` สุ่มค่าใหม่ทุกครั้ง Astro จะถือ token เก่าที่หายไปพร้อมฐานข้อมูล แล้ว build จะพังด้วย 401 เงียบ ๆ ตัวคำสั่งจึงเพิ่ม `--token=` ที่สร้างแถวใน `personal_access_tokens` จาก `hash('sha256', $plain)` โดยตรง (Sanctum ค้น token ที่ไม่มีส่วน `{id}|` จาก hash ได้ จึงใช้ค่าเดิมซ้ำได้ทุก deploy)
+
+```bash
+# geniuscorp-web/scripts/wait-for-api.sh - ข้อ 1: ปลุก API ก่อน build
+for i in $(seq 1 24); do
+  curl -sf -m 15 -o /dev/null "$API_URL/api/health" && exit 0
+  sleep 5
+done
+exit 1
+```
+
+เรียกก่อน `npm run build` ทั้งใน `deploy/deploy.sh` และใน GitHub Actions ถ้าไม่ปลุกก่อน Astro จะยิง fetch ไปเจอ cold start แล้ว build ล้มทันที
+
+ข้อ 4 แก้ด้วยการตั้ง `QUEUE_CONNECTION=sync` ใน Render: `ContentObserver` ตรวจค่านี้แล้วยิง `TriggerRebuild` ทันทีโดยไม่ debounce (ผู้เรียนต้องเข้าใจว่า debounce 2 นาทีเป็นของ production จริงที่มี worker)
+
+**ขั้นตอนโดยสรุป**
+
+1. Push โค้ด Laravel ขึ้น GitHub (ต้องมี `composer.json`, `composer.lock`, `Dockerfile`, `docker-entrypoint.sh`, `render.yaml`)
+2. Render → New → Blueprint → เลือก repo → ตั้ง `APP_KEY` (จาก `php artisan key:generate --show`) และ `BUILD_TOKEN` (`openssl rand -hex 24`)
+3. รอ deploy แล้วตรวจ `curl https://<ชื่อ>.onrender.com/api/health`
+4. Render → New → Static Site สำหรับ repo ของ Astro ตั้ง `API_URL`, `API_TOKEN` (= `BUILD_TOKEN`), `SITE` แล้ว build
+5. ตรวจเว็บที่ได้ด้วย Checklist เดิม: `/sitemap.xml`, `/llms.txt`, `/robots.txt`, JSON-LD และ H1
+
+> ⚠️ **อย่าใช้เส้นทางนี้กับเว็บลูกค้าจริง** cold start 1 นาทีทำให้ข้อ 18 ไม่ผ่าน ฐานข้อมูลที่รีเซ็ตทุกครั้งทำให้แก้ข้อมูลผ่าน Admin แล้วหาย และถ้าเผลอวางเว็บหลักไว้บน web service แผนฟรี AI crawler จะอ่าน `robots.txt` ตอนเว็บหลับแล้วเข้าใจว่าห้าม crawl ทั้งเว็บ เส้นทาง production จริงคือ Module 5.1-5.7
+
+---
+
 ## 📚 Module 6: Measurement & Monitoring - รู้ได้อย่างไรว่า AI ค้นเจอเราแล้ว
 
 ### เวลา 22:55-23:20 น.

@@ -191,6 +191,41 @@ curl -sI https://www.geniuscorp.example/ | grep -i strict-transport       # HSTS
 
 ---
 
+## H. ทางเลือกฟรีสำหรับคอร์ส: Render (Astro + Laravel) และ WordPress ในเครื่อง
+
+เส้นทาง A-G ข้างบนคือ production จริงบน VPS ส่วนหัวข้อนี้คือเส้นทางที่ใช้ในคลาส ซึ่งไม่มีค่าใช้จ่าย
+
+| ระบบ | ที่อยู่ | เหตุผล |
+| --- | --- | --- |
+| Astro | Render **Static Site** (ฟรี) | ไม่หลับ วัด TTFB ได้จริง crawler เข้าถึงตลอด |
+| Laravel API | Render **Web Service** (ฟรี) + Docker + **SQLite** | แผนฟรีไม่มี MySQL และ API เราเป็นงานอ่านอย่างเดียว |
+| WordPress | **ในเครื่อง (Laragon) เท่านั้น** | แผนฟรีไม่มี persistent disk และไม่มี MySQL รูป/plugin/ฐานข้อมูลจะหายทุกครั้งที่ container เกิดใหม่ |
+
+### ข้อจำกัดของแผนฟรีและวิธีรับมือ
+
+| ข้อจำกัด | ผลกระทบ | วิธีรับมือในโค้ดเฉลย |
+| --- | --- | --- |
+| หลับหลังไม่มี traffic 15 นาที ตื่นราว 1 นาที | Astro build ยิง fetch แล้ว timeout | `scripts/wait-for-api.sh` ปลุกก่อน build (เรียกใน `deploy.sh` และ workflow) |
+| Filesystem ephemeral | ไฟล์ SQLite หายทุก deploy/restart | `docker-entrypoint.sh` รัน `migrate` + `db:seed` ทุกครั้งที่บูต (`SEED_ON_BOOT=true`) |
+| ไม่มี Shell / one-off jobs | รัน artisan จาก Dashboard ไม่ได้ | ทุกคำสั่งอยู่ใน entrypoint |
+| Sanctum token อยู่ใน DB ที่รีเซ็ต | Astro ถือ token เก่า build ได้ 401 | `php artisan geo:issue-build-token --token=$BUILD_TOKEN` ออก token ค่าเดิมซ้ำทุกครั้ง |
+| ไม่มี Background Worker / Cron | queue worker รันไม่ได้ | `QUEUE_CONNECTION=sync` และ `ContentObserver` ยิง rebuild ทันทีเมื่อเจอ sync |
+| ขณะหลับตอบ `/robots.txt` เป็น `Disallow: /` | AI crawler เข้าใจว่าห้าม crawl | เว็บหลักต้องเป็น **Static Site** ไม่ใช่ Web Service ส่วน API เราใส่ `noindex` อยู่แล้ว |
+
+### ขั้นตอน
+
+35. เตรียม repo Laravel ให้มี `Dockerfile`, `docker-entrypoint.sh`, `render.yaml` (มีใน `Code/Day4/geniuscorp-api/`) และ `composer.json` / `composer.lock` ของโปรเจกต์จริง
+36. สุ่มค่า token หนึ่งค่าใช้ร่วมกันสองฝั่ง: `openssl rand -hex 24`
+37. Render → New → **Blueprint** → เลือก repo ของ API → กรอก `APP_KEY` (จาก `php artisan key:generate --show`) และ `BUILD_TOKEN` → Deploy
+38. ตรวจ `curl https://<api>.onrender.com/api/health` ต้องได้ `{"ok":true}` (ครั้งแรกอาจรอ 1 นาที)
+39. Render → New → **Static Site** → เลือก repo ของ Astro → Build Command `npm ci && bash scripts/wait-for-api.sh && npm run build`, Publish Directory `dist` → ตั้ง `API_URL`, `API_TOKEN` (ค่าเดียวกับ `BUILD_TOKEN`), `SITE`
+40. เปิดเว็บที่ได้แล้วตรวจด้วยชุดคำสั่งในหัวข้อ "ตรวจจบ Production" ยกเว้นข้อ TTFB ที่ยังไม่มีความหมายบนแผนฟรี
+41. WordPress ทำในเครื่องตาม `WordPress_GEO_Retrofit_Steps.md` และใช้ `/llms.txt` กับ `robots.txt` ของเว็บในเครื่องเพื่อสาธิตเท่านั้น
+
+> ⚠️ ห้ามใช้เส้นทางนี้กับเว็บลูกค้าจริง: cold start ทำให้ข้อ 18 ไม่ผ่าน ฐานข้อมูลรีเซ็ตทุกครั้งทำให้แก้ข้อมูลผ่าน Admin แล้วหาย และ Free Postgres ของ Render เองก็หมดอายุ 30 วันหลังสร้าง
+
+---
+
 ## ไฟล์ที่เกี่ยวข้องในโค้ดเฉลย
 
 ```
@@ -204,10 +239,17 @@ Code/Day4/geniuscorp-web/
 │   ├── webhook-server.mjs             ← ตัวเลือก B: รับ webhook + HMAC
 │   └── geo-webhook.service            ← systemd unit ของ webhook-server
 ├── .github/workflows/deploy.yml       ← ตัวเลือก A: GitHub Actions
+├── render.yaml                        ← Blueprint ของ Static Site บน Render
 └── scripts/
     ├── check-geo.mjs                  ← ด่านกั้นก่อน deploy
+    ├── wait-for-api.sh                ← ปลุก API ที่หลับอยู่ก่อน build (PaaS แผนฟรี)
     ├── indexnow.mjs                   ← แจ้ง URL ใหม่
     └── geo-crawler-report.sh          ← นับ AI crawlers จาก access log
+
+Code/Day4/geniuscorp-api/
+├── Dockerfile                         ← image สำหรับ Render (php-cli + artisan serve)
+├── docker-entrypoint.sh               ← migrate + seed + ออก build token ทุกครั้งที่บูต
+└── render.yaml                        ← Blueprint ของ Web Service (SQLite, queue=sync)
 
 Code/Day4/geniuscorp-wp/
 ├── wp-config-production.snippet.php   ← ค่าที่ต้องเพิ่มบน production
@@ -224,4 +266,6 @@ Code/Day4/geniuscorp-wp/
 - WordPress hardening: https://developer.wordpress.org/advanced-administration/security/hardening/
 - GitHub Actions `repository_dispatch`: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#repository_dispatch
 - IndexNow: https://www.indexnow.org/
+- Render Deploy for Free (ข้อจำกัดของแผนฟรี): https://render.com/docs/free
+- Render Laravel + Docker: https://render.com/docs/deploy-php-laravel-docker
 - Bing Webmaster Tools: https://www.bing.com/webmasters
