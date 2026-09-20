@@ -95,9 +95,10 @@ Child Theme `geniuscorp-geo` **พึ่งพา plugin 2 ตัว** และ
 6. เปิด `http://geniuscorp.test/` ต้องเห็นหน้าแรก, `/services/` (หน้า "บริการ"), `/blog/` และ `/web-development/` ถ้า theme ไม่แสดงเมนูให้สร้างที่ Appearance → Menus (ใส่หน้า หน้าแรก, เกี่ยวกับเรา, บริการ, บทความ, ติดต่อเรา)
 7. **Settings → General** (ตั้งค่า → ทั่วไป) → ชื่อเว็บ = `GeniusCorp` และช่อง **คำโปรย (Tagline)** วางข้อความนี้ทั้งบรรทัด:
    `บริษัทพัฒนาเว็บ แอป ซอฟต์แวร์ ERP CRM ครบวงจร ราคาถูก คุณภาพดี บริการทั่วประเทศ รับทำเว็บไซต์ รับเขียนโปรแกรม รับทำแอป`
-   แล้ว Save Changes (ตั้งใจให้ยาวและยัด keyword เพื่อจำลอง "ปัญหาข้อ 3": Rank Math ค่าเริ่มต้นใช้ Tagline (`%sitedesc%`) ใน **Title ของหน้าแรก** และ theme ส่วนใหญ่แสดง Tagline ใต้โลโก้หรือใน footer ทุกหน้า เราจะแก้ใน Module 3) · หมายเหตุ: WordPress Importer นำเข้าเฉพาะโพสต์/หน้า/หมวดหมู่ ไม่แตะ Settings จึงต้องตั้งเองข้อนี้
+   แล้ว Save Changes (ตั้งใจให้ยาวและยัด keyword เพื่อจำลอง "ปัญหาข้อ 3") · หมายเหตุ: WordPress Importer นำเข้าเฉพาะโพสต์/หน้า/หมวดหมู่ ไม่แตะ Settings จึงต้องตั้งเองข้อนี้
+8. **Appearance → Customize → Header Builder → คลิก "Site Title & Logo" → เปิด "Display Site Tagline" → Publish** (Astra ปิดไว้เป็นค่าเริ่มต้น แต่เว็บองค์กรจำนวนมากเปิดโชว์ tagline ใต้โลโก้ทุกหน้า นี่คือจุดที่ keyword stuffing ของข้อ 7 จะ "มองเห็นได้" ในทุกหน้า)
 
-ตรวจผลก่อนไปต่อ: เปิด `view-source:http://geniuscorp.test/web-development/` ควรเห็น `<h1` **2 ตัว** (ของ theme + ในเนื้อหา), `application/ld+json` **1 block** ของ Rank Math ที่มี `"@type":"Article"` และ `"name":"..."` ขององค์กรเป็นชื่อเก่าจากตอนติดตั้ง WordPress, `<meta name="description"` เป็นย่อหน้าแนะนำบริษัท, และ `<title>` สั้น (`รับพัฒนาเว็บไซต์องค์กร - GeniusCorp`) ถ้าได้แบบนี้แปลว่า "สภาพก่อน Retrofit" ถูกต้องแล้ว
+ตรวจผลก่อนไปต่อ: เปิด `view-source:http://geniuscorp.test/web-development/` ควรเห็น `<h1` **2 ตัว** (`entry-title` ของ theme + `<h1>` ในเนื้อหา), `application/ld+json` **1 block** ของ Rank Math ที่มี `"@type":"Article"` และ `"@type":["Person","Organization"]` ชื่อเป็นชื่อเว็บตอนติดตั้ง WordPress, `itemtype="https://schema.org/..."` ของ Astra กระจายอยู่ในแท็ก HTML, `<meta name="description"` เป็นย่อหน้าแนะนำบริษัท, `<title>` สั้น (`รับพัฒนาเว็บไซต์องค์กร - GeniusCorp`) และหน้าแรกมี `<title>หน้าแรก - GeniusCorp</title>` (Rank Math ใช้ template ของ Page กับหน้าแรกแบบ static page) ถ้าได้แบบนี้แปลว่า "สภาพก่อน Retrofit" ถูกต้องแล้ว
 
 > ⛔ **ถ้า Import ไม่ขึ้นหน้า Assign Authors หรือ error "This does not appear to be a WXR file":** ตรวจว่าเลือกไฟล์ `.xml` ไม่ใช่ `.zip` และไฟล์ไม่ถูกเปิดแก้ด้วย Word/Notepad จนเปลี่ยน encoding · **ถ้าอัปโหลดไม่ได้เพราะไฟล์ใหญ่กว่า `upload_max_filesize`:** ไฟล์นี้ขนาดเพียง ~42 KB จึงไม่ควรเกิด ถ้าเกิดให้ตรวจ php.ini ของ Laragon
 
@@ -107,7 +108,7 @@ Child Theme `geniuscorp-geo` **พึ่งพา plugin 2 ตัว** และ
 | - | ------------------------------------------------------------------------------------ | ----------------------------- | ------------ |
 | 1 | หน้าบริการมี `<h1>` **ในเนื้อหา** (คนเขียนใส่เองใน editor) ซ้อนกับ `<h1 class="entry-title">` ที่ theme ใส่ให้ → H1 ซ้ำ 2 ตัว (theme บางตัวยังทำโลโก้เป็น `<h1>` ทุกหน้าซ้ำอีกชั้น; Astra ทำโลโก้เป็น H1 เฉพาะหน้าแรก) | Theme/เนื้อหา สร้าง H1 ซ้ำ    | 3            |
 | 2 | หน้าแรก: เนื้อหา **ไม่มี H1** (hero เป็น `div`, ตัวเลขสถิติเป็น `h2`) H1 เดียวที่มีคือชื่อเว็บจากโลโก้ซึ่งบอกแค่ "GeniusCorp" ไม่บอกว่าทำอะไร + หน้ารวมบริการทำการ์ดเป็น `<h2>` 8 ตัว | Heading เป็น noise, หน้าแรกไม่มี H1 | 3       |
-| 3 | Tagline ที่ตั้งไว้ในขั้นที่ 1 ข้อ 7 ยาว 100+ ตัวอักษรแบบ keyword stuffing → Rank Math ค่าเริ่มต้นของหน้าแรก `%sitename% %page% %sep% %sitedesc%` ทำให้ **Title หน้าแรกยาว 120+ ตัวอักษร** และ theme แสดง Tagline ใต้โลโก้/ใน footer ทุกหน้า (หน้าอื่น Title ยังสั้นเพราะค่าเริ่มต้นคือ `%title% %sep% %sitename%` แต่เว็บจริงจำนวนมากถูกแก้ให้ต่อ `%sitedesc%` ทุกหน้า) | Title ยาว + keyword stuffing | 3            |
+| 3 | Tagline keyword stuffing 100+ ตัวอักษร (ขั้นที่ 1 ข้อ 7-8) แสดงใต้โลโก้ **ทุกหน้า** และ Title หน้าแรกเป็น `หน้าแรก - GeniusCorp` ที่ไม่บอกเลยว่าบริษัททำอะไร (Rank Math ใช้ template ของ Page กับหน้าแรกแบบ static ส่วน `%sitedesc%` จะโผล่ใน Title ก็ต่อเมื่อหน้าแรกเป็น "Your latest posts" หรือมีคนแก้ template ให้ต่อ tagline ซึ่งพบบ่อยในเว็บจริง) | Title ไม่มีคุณค่า + keyword stuffing | 3            |
 | 4 | Meta description ว่างทุกหน้า → Rank Math auto-generate จากย่อหน้าแรกที่เป็น boilerplate  | description boilerplate       | 3            |
 | 5 | มี `?utm_source=`, `?ref=` และหน้า `/services/?page=2` ที่ canonical ชี้ผิด             | ไม่มี/ผิด Canonical           | 3            |
 | 6 | Rank Math เปิด Schema "Article" ให้ **ทุก post type** รวมหน้าบริการ + Theme ฉีด Organization ของตัวเอง + Page Builder ฉีด WebPage → Schema ซ้อน 3 ชุด ขัดกัน | Schema ซ้ำจากหลาย Plugin | 4 |
@@ -118,7 +119,7 @@ Child Theme `geniuscorp-geo` **พึ่งพา plugin 2 ตัว** และ
 | 11 | robots.txt เป็นค่าเริ่มต้นและ sitemap ของ Rank Math มี `lastmod` เท่ากันทุก URL (เพราะ import) | Sitemap lastmod ไม่จริง      | Day 4        |
 | 12 | ไม่มี llms.txt                                                                        | ไม่มี llms.txt                | Day 4        |
 
-> 📌 **ปัญหาไหนอยู่ในไฟล์ Demo (.xml) และปัญหาไหนมาจากเครื่องของผู้เรียน:** ไฟล์ WXR นำเข้าได้เฉพาะ "เนื้อหา" (หน้า โพสต์ หมวดหมู่ tagline) จึงมีปัญหาข้อ **1, 2, 4, 8, 11** ติดมาในไฟล์ ข้อ **3** ผู้เรียนตั้งเองในขั้นที่ 1 ข้อ 7 (Tagline) ส่วนข้อ **5, 6, 7, 9, 10, 12** ขึ้นกับ theme/plugin/รูปที่ติดตั้งบนเครื่อง: ข้อ 6-7 เห็นทันทีเมื่อเปิด Rank Math + Astra ตามขั้นที่ 0 (Rank Math: Schema Type ค่าเริ่มต้น = Article ทุก post type, `og:site_name` และ Organization ใน `@graph` ยังเป็นชื่อเว็บเก่าจากตอนติดตั้ง WordPress หรือจาก Setup Wizard; Astra: microdata `itemtype` ซ้อนอีกชั้น); ข้อ 9-10 ผู้สอนสาธิตจากเว็บตัวอย่างบนเครื่องผู้สอน ผู้เรียนที่ต้องการทดลองเองให้อัปโหลดรูป JPEG ขนาดใหญ่ 1 รูปเป็น Featured Image และเปิด plugin ที่มีอยู่แล้วในเครื่องเพิ่ม 2-3 ตัว
+> 📌 **ปัญหาไหนอยู่ในไฟล์ Demo (.xml) และปัญหาไหนมาจากเครื่องของผู้เรียน:** ไฟล์ WXR นำเข้าได้เฉพาะ "เนื้อหา" (หน้า โพสต์ หมวดหมู่ tagline) จึงมีปัญหาข้อ **1, 2, 4, 8, 11** ติดมาในไฟล์ ข้อ **3** ผู้เรียนตั้งเองในขั้นที่ 1 ข้อ 7-8 (Tagline + เปิดแสดง) ส่วนข้อ **5, 6, 7, 9, 10, 12** ขึ้นกับ theme/plugin/รูปที่ติดตั้งบนเครื่อง: ข้อ 6-7 เห็นทันทีเมื่อเปิด Rank Math + Astra ตามขั้นที่ 0 (Rank Math: Schema Type ค่าเริ่มต้น = Article ทุก post type, `og:site_name` และ Organization ใน `@graph` ยังเป็นชื่อเว็บเก่าจากตอนติดตั้ง WordPress หรือจาก Setup Wizard; Astra: microdata `itemtype` ซ้อนอีกชั้น); ข้อ 9-10 ผู้สอนสาธิตจากเว็บตัวอย่างบนเครื่องผู้สอน ผู้เรียนที่ต้องการทดลองเองให้อัปโหลดรูป JPEG ขนาดใหญ่ 1 รูปเป็น Featured Image และเปิด plugin ที่มีอยู่แล้วในเครื่องเพิ่ม 2-3 ตัว
 
 > 🧪 **ก่อนแก้อะไร ให้วัดค่าเริ่มต้นไว้ก่อน** (Workshop ท้ายวันจะเทียบก่อน-หลัง): เปิด `view-source:http://geniuscorp.test/` นับ `<h1`, นับ `application/ld+json`, ดูขนาดหน้า (DevTools → Network → Doc → Size) และรัน Query Monitor ดูจำนวน query กับเวลา (ยังไม่ต้องรัน PageSpeed เพราะเว็บอยู่ในเครื่อง จะวัดจริงตอน Deploy ใน Day 4 หรือใช้ Lighthouse ใน Chrome DevTools แทน)
 
@@ -353,7 +354,8 @@ wp-content/themes/
     │   ├── geo-post-types.php← CPT service + taxonomy
     │   ├── geo-schema.php    ← JSON-LD builders + wp_head hook
     │   ├── geo-faq.php       ← ACF FAQ + template part
-    │   └── geo-performance.php ← WebP, lazy load, dequeue
+    │   ├── geo-performance.php ← WebP, lazy load, dequeue
+    │   └── geo-setup.php     ← Tools → GEO Setup (ตั้งค่า Rank Math ตามตาราง 3.2 ปุ่มเดียว)
     ├── template-parts/
     │   ├── faq.php           ← FAQ Section
     │   └── author-box.php    ← (Day 4)
@@ -399,6 +401,7 @@ foreach ([
     'geo-schema',
     'geo-faq',
     'geo-performance',
+    'geo-setup',       // Tools → GEO Setup (ตั้งค่า Rank Math/Tagline ปุ่มเดียว - ใช้ตรวจคำตอบ)
 ] as $file) {
     require_once GC_GEO_DIR . '/inc/' . $file . '.php';
 }
@@ -415,9 +418,10 @@ Appearance → Themes → Activate **GeniusCorp GEO** (Child) แล้วตร
 | ที่ตั้งค่า                     | ค่าเดิม (ปัญหา)                                                        | ค่าใหม่                                                     |
 | ------------------------------ | ---------------------------------------------------------------------- | ----------------------------------------------------------- |
 | Global Meta → Separator        | `-`                                                                    | `\|` (หรือคงเดิม ไม่สำคัญ)                                   |
-| Homepage → Title               | `%sitename% %page% %sep% %sitedesc%` (ค่าเริ่มต้น) → ได้ `GeniusCorp - บริษัทพัฒนาเว็บ แอป ซอฟต์แวร์ ERP CRM ... รับทำแอป` (120+ ตัวอักษร) | `GeniusCorp - บริษัทพัฒนาซอฟต์แวร์และเว็บไซต์องค์กรที่ AI ค้นเจอ` (พิมพ์ข้อความจริง ไม่ใช้ `%sitedesc%`) |
-| Homepage → Description         | (ว่าง)                                                                 | เขียนจริง 150-160 ตัวอักษร เหมือน `SITE.defaultDescription` ฝั่ง Astro |
-| Settings → General → Tagline   | ข้อความ keyword stuffing 100+ ตัวอักษร (ขั้นที่ 1 ข้อ 7)                  | ประโยคสั้น 40-60 ตัวอักษร เช่น `พัฒนาเว็บไซต์และซอฟต์แวร์องค์กร` (theme แสดง Tagline ใต้โลโก้/ footer และ Rank Math ใช้เป็น `WebSite.description`) |
+| หน้าแรก (static page) → แก้ไขหน้า "หน้าแรก" → กล่อง Rank Math → SEO Title | (ว่าง → ใช้ template ของ Page = `หน้าแรก - GeniusCorp`) | `GeniusCorp - บริษัทพัฒนาซอฟต์แวร์และเว็บไซต์องค์กรที่ AI ค้นเจอ` (พิมพ์ข้อความจริง) |
+| หน้าแรก → กล่อง Rank Math → Description | (ว่าง → auto จากเนื้อหา)                                          | เขียนจริง 150-160 ตัวอักษร เหมือน `SITE.defaultDescription` ฝั่ง Astro |
+| Titles & Meta → Homepage (ใช้เฉพาะเมื่อหน้าแรกเป็น "Your latest posts") | `%sitename% %page% %sep% %sitedesc%` → ต่อ tagline ยาว | `%sitename% %sep% บริษัทพัฒนาซอฟต์แวร์และเว็บไซต์องค์กรที่ AI ค้นเจอ` |
+| Settings → General → Tagline   | ข้อความ keyword stuffing 100+ ตัวอักษร (ขั้นที่ 1 ข้อ 7)                  | ประโยคสั้น 30-60 ตัวอักษร เช่น `พัฒนาเว็บไซต์ แอป และซอฟต์แวร์องค์กร` (แสดงใต้โลโก้ทุกหน้า และ Child Theme ใช้เป็น `WebSite.description`) |
 | Post Types → Posts → Title     | `%title% %sep% %sitename%` (ค่าเริ่มต้นถูกอยู่แล้ว - เว็บจริงมักถูกแก้เป็น `%title% %sep% %sitename% %sep% %sitedesc%`) | คง `%title% %sep% %sitename%` และตรวจว่าไม่มี `%sitedesc%` ต่อท้าย |
 | Post Types → Posts → Description | `%excerpt%` (ดึงย่อหน้าแรก)                                          | `%excerpt%` **แต่ต้องเขียน Excerpt จริงทุกโพสต์** (ดูด้านล่าง) |
 | Post Types → Pages → Title     | เหมือน Posts                                                           | `%title% %sep% %sitename%`                                  |
@@ -426,6 +430,8 @@ Appearance → Themes → Activate **GeniusCorp GEO** (Child) แล้วตร
 | Post Types → Services → Schema Type | Article (ค่าเริ่มต้นผิด!)                                          | **None** (เราจะฉีด Service เอง)                              |
 | Post Types → Posts → Schema Type | Article                                                              | **None** (เราฉีดเองเพื่อควบคุม author/dates - Module 4) หรือคง Article ถ้าไม่เขียนเอง |
 | Social Meta → Open Graph        | ปิด                                                                   | เปิด + ใส่ Default OG image 1200×630                         |
+
+> 🧪 **ตรวจคำตอบ / ทางลัดสำหรับผู้สอน:** Child Theme มีหน้า **Tools → GEO Setup** ที่ตั้งค่าทุกแถวในตารางนี้ (รวม Tagline, Knowledge Graph = Company, Schema Type = None, CPT service ใน sitemap) ด้วยปุ่มเดียว พร้อมตารางค่าปัจจุบัน → ค่าที่จะตั้ง (option key จริงของ Rank Math เช่น `pt_page_default_rich_snippet`) ในคลาสให้ตั้งด้วยมือก่อน 1 รอบเพื่อให้รู้ว่าแต่ละค่าอยู่ตรงไหน แล้วค่อยใช้ปุ่มเทียบว่าตรงกันไหม · ปุ่มนี้ทำ "เนื้อหา" ให้ไม่ได้ (excerpt, H1, CPT) ดูรายการที่ท้ายหน้านั้น
 
 > 📌 **ทำไม `%excerpt%` ถึงเป็น boilerplate:** Rank Math ใช้ Excerpt ถ้ามี ถ้าไม่มีจะตัดจากเนื้อหา และเว็บส่วนใหญ่เริ่มทุกบทความด้วยย่อหน้าแนะนำบริษัท → description เหมือนกันทุกหน้า วิธีแก้ที่ยั่งยืนคือ **บังคับให้ทีมคอนเทนต์กรอก Excerpt** (Screen Options → เปิด Excerpt box) และใช้ Excerpt เป็นทั้ง meta description และ `Article.description` เหมือนที่ฝั่ง Laravel มีฟิลด์ `excerpt`
 
@@ -448,12 +454,21 @@ add_action('admin_notices', function () {
     echo '<div class="notice notice-error"><p><strong>GEO:</strong> ยังไม่ได้เขียนคำอธิบายย่อ (Excerpt) 70-170 ตัวอักษร โพสต์ถูกบันทึกเป็นฉบับร่างแทน</p></div>';
 });
 
+function gc_excerpt_length(string $excerpt): int
+{
+    return mb_strlen(trim(wp_strip_all_tags($excerpt)));
+}
+
+// Classic editor / Quick Edit: ถ้า excerpt ไม่ผ่านให้เก็บเป็น draft + แจ้งเตือน
 add_filter('wp_insert_post_data', function (array $data, array $postarr) {
+    if (defined('WP_IMPORTING') && WP_IMPORTING) {
+        return $data;   // ตอน Import WXR ไม่บังคับ (ไฟล์ demo "ก่อนแก้" ตั้งใจไม่มี excerpt)
+    }
     if (! in_array($data['post_type'], ['post', 'service'], true) || $data['post_status'] !== 'publish') {
         return $data;
     }
 
-    $length = mb_strlen(trim(wp_strip_all_tags($data['post_excerpt'])));
+    $length = gc_excerpt_length((string) $data['post_excerpt']);
 
     if ($length < 70 || $length > 170) {
         $data['post_status'] = 'draft';
@@ -462,7 +477,24 @@ add_filter('wp_insert_post_data', function (array $data, array $postarr) {
 
     return $data;
 }, 10, 2);
+
+// Block editor บันทึกผ่าน REST API: ต้องตอบ WP_Error ไม่งั้น editor เห็นแค่ "ฉบับร่าง" โดยไม่รู้สาเหตุ
+foreach (['post', 'service'] as $gc_post_type) {
+    add_filter("rest_pre_insert_{$gc_post_type}", function ($prepared, WP_REST_Request $request) {
+        if (is_wp_error($prepared) || ($prepared->post_status ?? '') !== 'publish') {
+            return $prepared;
+        }
+        $excerpt = $prepared->post_excerpt ?? (! empty($prepared->ID) ? get_post_field('post_excerpt', $prepared->ID) : '');
+        $length  = gc_excerpt_length((string) $excerpt);
+        if ($length < 70 || $length > 170) {
+            return new WP_Error('gc_excerpt_required', "GEO: กรุณาเขียนคำอธิบายย่อ (Excerpt) 70-170 ตัวอักษรก่อนเผยแพร่ (ตอนนี้ {$length} ตัวอักษร)", ['status' => 400]);
+        }
+        return $prepared;
+    }, 10, 2);
+}
 ```
+
+> 📌 **ทำไมต้องมี 2 filter:** Block Editor ไม่ผ่าน `redirect_post_location` (บันทึกด้วย REST) ถ้ามีแค่ filter แรก ผู้ใช้จะกด Publish แล้วเห็นสถานะกลายเป็น Draft เงียบ ๆ ส่วน `rest_pre_insert_{post_type}` ทำให้ editor ขึ้นข้อความ error สีแดงพร้อมเหตุผล
 
 ### 3.3 แก้ปัญหา Canonical จาก query string, Pagination และ Archive
 
@@ -505,11 +537,9 @@ add_filter('rank_math/frontend/canonical', function (string $canonical): string 
 
 **ปัญหา 1 - H1 ซ้ำ 2 ตัวในหน้าบริการ:** มี 2 ชั้นที่ต้องดู
 
-ชั้นที่ 1 - `<h1>` ในเนื้อหา: เปิด `view-source:/web-development/` จะเห็น `<h1 class="entry-title">` ของ Astra แล้วตามด้วย `<h1>รับพัฒนาเว็บไซต์องค์กร</h1>` ที่อยู่ในตัวเนื้อหา (คนเขียนใส่ block Heading ระดับ H1 เอง พบบ่อยมากในเว็บจริง) วิธีแก้คือแก้ที่เนื้อหา ไม่ใช่โค้ด: Pages → แก้ไขหน้าบริการทั้ง 3 หน้า → คลิก block Heading นั้น → เปลี่ยนระดับเป็น **H2** หรือลบทิ้ง (เพราะ theme ใส่ชื่อเรื่องเป็น H1 ให้แล้ว) → Update · และตอนย้ายไป CPT `service` ในการบ้าน อย่าคัดลอก H1 ติดไปด้วย
+ชั้นที่ 1 - `<h1>` ในเนื้อหา: เปิด `view-source:/web-development/` จะเห็น `<h1 class="entry-title">` ของ Astra แล้วตามด้วย `<h1>รับพัฒนาเว็บไซต์องค์กร</h1>` ที่อยู่ในตัวเนื้อหา (คนเขียนใส่ block Heading ระดับ H1 เอง พบบ่อยมากในเว็บจริง) ทางที่ถูกคือแก้ที่เนื้อหา: Pages → แก้ไขหน้าบริการทั้ง 3 หน้า → คลิก block Heading นั้น → เปลี่ยนระดับเป็น **H2** หรือลบทิ้ง (เพราะ theme ใส่ชื่อเรื่องเป็น H1 ให้แล้ว) → Update · และตอนย้ายไป CPT `service` ในการบ้าน อย่าคัดลอก H1 ติดไปด้วย · แต่เว็บจริงมีหลายร้อยหน้า เราจึงใส่ **safety net** ใน Child Theme: filter `the_content` ลด `<h1>` ในเนื้อหาของหน้าเดี่ยวเป็น `<h2>` (โค้ดด้านล่าง) ผู้เรียนต้องเข้าใจว่านี่คือการ "ปิดแผล" ไม่ใช่การรักษา
 
-ชั้นที่ 2 - โลโก้เป็น `<h1>`: Astra ทำถูกอยู่แล้ว (โลโก้เป็น `<h1>` เฉพาะหน้าแรก หน้าอื่นเป็น `<span class="site-title">`) แต่ theme จำนวนมากใส่ `<h1 class="site-title">` ใน header.php ให้ทุกหน้า เราจึงใส่ filter ไว้ใน Child Theme เผื่อไว้ทุกกรณี วิธีแก้มี 2 ระดับ:
-
-ระดับ filter (ถ้า theme มี filter ให้ เช่น Astra: `astra_site_title_tag`, GeneratePress: `generate_site_title_output`, Kadence: `kadence_site_title_tag`):
+ชั้นที่ 2 - โลโก้เป็น `<h1>`: Astra รุ่นปัจจุบัน (4.13) ใช้ `<span class="site-title">` ทุกหน้าอยู่แล้ว แต่ theme จำนวนมากใส่ `<h1 class="site-title">` ให้ทุกหน้า และที่สำคัญ Astra พิมพ์ site-title **2 ครั้ง** (header desktop + mobile) ถ้าเผลอ filter ให้เป็น `h1` จะได้ H1 ซ้ำทันที (โค้ดเฉลยรุ่นแรกพลาดตรงนี้) เราจึงบังคับเป็น `<p>` เสมอ:
 
 ```php
 <?php
@@ -517,37 +547,51 @@ add_filter('rank_math/frontend/canonical', function (string $canonical): string 
 
 defined('ABSPATH') || exit;
 
-/**
- * โลโก้/ชื่อเว็บใน header ต้องเป็น <p> ไม่ใช่ <h1> (ยกเว้นหน้าแรก ถ้าหน้าแรกไม่มี H1 อื่น)
- */
-$gc_site_title_tag = fn () => is_front_page() ? 'h1' : 'p';
-
-// Astra (parent ของคอร์ส)
-add_filter('astra_site_title_tag', $gc_site_title_tag);
-
-// GeneratePress (ไม่มี tag filter ใช้ output filter แทน)
-add_filter('generate_site_title_output', function (string $output): string {
-    if (is_front_page()) {
-        return $output;
-    }
+// ── 1) โลโก้/ชื่อเว็บใน header เป็น <p> เสมอ ────────────────────────────────
+add_filter('astra_site_title_tag', fn () => 'p');                     // Astra (parent ของคอร์ส)
+add_filter('kadence_site_title_tag', fn () => 'p');                   // Kadence
+add_filter('generate_site_title_output', function (string $output): string {   // GeneratePress ไม่มี tag filter
     return str_replace(['<h1', '</h1>'], ['<p', '</p>'], $output);
 });
 
-// Kadence
-add_filter('kadence_site_title_tag', $gc_site_title_tag);
+// ── 2) <h1> ในเนื้อหาของหน้าเดี่ยว → <h2> (theme ใส่ H1 ชื่อเรื่องให้แล้ว) ─────
+add_filter('the_content', function (string $content): string {
+    if (is_front_page() || ! is_singular() || ! in_the_loop() || ! is_main_query()) {
+        return $content;
+    }
+    return (string) preg_replace('/<h1\b([^>]*)>(.*?)<\/h1>/is', '<h2$1>$2</h2>', $content);
+}, 5);
+
+// ── 3) หน้าแรก: ถ้าเนื้อหามี <h1> ของตัวเอง (hero) → ปิด H1 "หน้าแรก" ของ Astra ──
+add_filter('astra_the_title_enabled', function (bool $enabled): bool {
+    if (is_front_page() && is_page()) {
+        $content = (string) get_post_field('post_content', get_queried_object_id());
+        if (stripos($content, '<h1') !== false) {
+            return false;
+        }
+    }
+    return $enabled;
+});
+
+// ── 4) Posts page (/blog/) ที่ Astra ไม่ใส่ H1 ให้ → ใส่เอง ───────────────────
+add_action('astra_primary_content_top', function () {
+    if (is_home() && ! is_front_page()) {
+        $page_id = (int) get_option('page_for_posts');
+        echo '<h1 class="page-title ast-archive-title">' . esc_html($page_id ? get_the_title($page_id) : 'บทความ') . '</h1>';
+    }
+});
 ```
 
-ระดับ template override (ถ้า theme ไม่มี filter): คัดลอก `header.php` จาก parent มาไว้ใน child แล้วแก้:
+ระดับ template override (ถ้า theme ไม่มี filter เลย): คัดลอก `header.php` จาก parent มาไว้ใน child แล้วแก้ส่วนโลโก้ (ดู `header.php.example` ในโค้ดเฉลย):
 
 ```php
 <?php // geniuscorp-geo/header.php (เฉพาะส่วนโลโก้) ?>
-<?php $tag = is_front_page() ? 'h1' : 'p'; ?>
-<<?php echo $tag; ?> class="site-title">
+<p class="site-title">
     <a href="<?php echo esc_url(home_url('/')); ?>" rel="home"><?php bloginfo('name'); ?></a>
-</<?php echo $tag; ?>>
+</p>
 ```
 
-**ปัญหา 2 - หน้าแรกไม่มี H1 ในเนื้อหา เพราะ hero เป็น `<div>` (หรือ Page Builder ทำ heading เป็น `<span>`):** ใน Demo หน้าแรกมี H1 อยู่ตัวเดียวคือโลโก้ "GeniusCorp" (Astra ใส่ให้ในหน้าแรก) ซึ่งผ่านเกณฑ์ "มี H1" ในเชิงเทคนิค แต่ไม่ได้บอก AI ว่าเว็บนี้ทำอะไร ทางที่ดีกว่าคือ Pages → แก้ไข "หน้าแรก" → เปลี่ยน `<div class="hero-title">พัฒนาเว็บไซต์และซอฟต์แวร์องค์กรครบวงจร</div>` เป็น block Heading ระดับ **H1** (ใน Code editor แก้ `div` เป็น `h1` ได้เลย) (ถ้าใช้ Page Builder แก้ที่ widget heading → HTML tag = H1) แล้วให้โลโก้เป็น `<p>` ทุกหน้ารวมหน้าแรก โดยแก้บรรทัดใน `geo-headings.php` เป็น `$gc_site_title_tag = fn () => 'p';` (เลือกได้ทั้ง 2 แบบ แต่ห้ามมี H1 สองตัวในหน้าแรก)
+**ปัญหา 2 - หน้าแรก: H1 เดียวที่มีคือ "หน้าแรก" (entry-title ของ Astra) ส่วน hero เป็น `<div>`:** ผ่านเกณฑ์ "มี H1" ในเชิงเทคนิค แต่ H1 "หน้าแรก" ไม่ได้บอก AI ว่าเว็บนี้ทำอะไร วิธีแก้: Pages → แก้ไข "หน้าแรก" → เปลี่ยน `<div class="hero-title">พัฒนาเว็บไซต์และซอฟต์แวร์องค์กรครบวงจร</div>` เป็น block Heading ระดับ **H1** (ใน Code editor แก้ `div` เป็น `h1` ได้เลย ถ้าใช้ Page Builder แก้ที่ widget heading → HTML tag = H1) แล้ว Update · โค้ดข้อ 3 ด้านบนจะตรวจเจอ `<h1` ในเนื้อหาและปิด H1 "หน้าแรก" ของ Astra ให้อัตโนมัติ จึงเหลือ H1 เดียวที่มีความหมาย (ดูผลใน `demo-site/geniuscorp-wp-demo-after.xml`)
 
 **ปัญหา 3 - การ์ดเป็น `<h2>` 8 ตัวในหน้ารวมบริการ:** ถ้าหน้ารวมสร้างด้วย loop ของ theme (archive template) แก้ที่ template ครั้งเดียว:
 
@@ -558,7 +602,7 @@ get_header(); ?>
 
 <main id="main" class="site-main container">
     <h1><?php post_type_archive_title(); ?></h1>
-    <p class="lead"><?php echo esc_html(get_option('gc_service_archive_intro', 'เราให้บริการ ' . wp_count_posts('service')->publish . ' ด้านหลัก ครอบคลุมตั้งแต่การพัฒนาเว็บไซต์องค์กร โมบายแอปพลิเคชัน จนถึงการทำให้เว็บถูกอ้างอิงโดย AI Search')); ?></p>
+    <p class="lead"><?php echo esc_html(gc_service_archive_intro()); ?></p>
 
     <div class="grid">
         <?php while (have_posts()) : the_post(); ?>
@@ -607,20 +651,35 @@ Rank Math ใส่ `article:published_time`/`article:modified_time` ให้�
 // inc/geo-metadata.php (ต่อ)
 
 /**
- * เสริม OG ของบทความ: article:author = URL หน้าผู้เขียน (ตรงกับ Person @id ใน Schema)
- * และบังคับ og:type ของ service = website
+ * เสริม OG: og:type = article เฉพาะบทความ (Rank Math ค่าเริ่มต้นใส่ article ให้ทุก post type รวม page/archive)
+ * og:site_name ของ Rank Math มาจากชื่อใน Setup Wizard ไม่ใช่ Settings → General (มักค้างเป็นชื่อเก่า) → บังคับให้ตรง
+ * บทความ: article:author = URL หน้าผู้เขียน (ตรงกับ Person @id ใน Schema) + published/modified time
+ * (Rank Math ใส่ published_time ให้เฉพาะเมื่อเปิด Schema Article ของมัน ซึ่งเราปิดใน Module 4)
  */
 add_filter('rank_math/opengraph/facebook/og_type', function (string $type): string {
-    return is_singular('service') ? 'website' : $type;
+    return is_singular('post') ? 'article' : 'website';
 });
+
+add_filter('rank_math/opengraph/facebook/og_site_name', fn () => get_bloginfo('name'));
 
 add_action('rank_math/opengraph/facebook', function ($og) {
     if (! is_singular('post')) {
         return;
     }
-    $author_url = get_author_posts_url((int) get_post_field('post_author', get_the_ID()));
+    $post       = get_post();
+    $author_url = get_author_posts_url((int) $post->post_author);
     $og->tag('article:author', esc_url($author_url));
     $og->tag('article:section', 'บทความ');
+    $og->tag('article:published_time', wp_date(DATE_ATOM, strtotime($post->post_date)));
+    $og->tag('article:modified_time', wp_date(DATE_ATOM, strtotime($post->post_modified)));
+});
+
+// Title/Description ของหน้ารวมบริการ (Rank Math ค่าเริ่มต้นได้ "บริการ Archive - ..." และ description = title)
+add_filter('rank_math/frontend/title', function ($title) {
+    return is_post_type_archive('service') ? 'บริการของเรา - ' . get_bloginfo('name') : $title;
+});
+add_filter('rank_math/frontend/description', function ($description) {
+    return is_post_type_archive('service') ? gc_service_archive_intro() : $description;   // ฟังก์ชันอยู่ใน geo-post-types.php (Module 4.2)
 });
 ```
 
@@ -729,7 +788,22 @@ add_action('init', function () {
 
 defined('ABSPATH') || exit;
 
+/** ข้อความแนะนำหน้ารวมบริการ (ใช้ใน archive template, meta description และ GEO Setup) */
+function gc_service_archive_intro(): string
+{
+    $count = (int) wp_count_posts('service')->publish;
+    return "GeniusCorp ให้บริการ {$count} ด้านหลัก ครอบคลุมตั้งแต่การพัฒนาเว็บไซต์องค์กร โมบายแอปพลิเคชัน จนถึงการทำให้เว็บถูกอ้างอิงโดย AI Search ทุกบริการระบุราคาเริ่มต้นและระยะเวลาชัดเจน";
+}
+
 add_action('init', function () {
+    /**
+     * กับดักของเว็บเดิม: URL /services/ ชนกับ Page "บริการ" (slug services) และ WordPress ให้ archive ของ CPT ชนะ
+     * → ถ้าเปิด has_archive ตั้งแต่แรก หน้า "บริการ" เดิมจะหายไปกลายเป็น archive ว่างทันทีที่ Activate theme
+     * เราจึงเปิด archive เฉพาะเมื่อไม่มี Page slug นั้นแล้ว (ย้ายบริการเสร็จ → Trash Page เดิม → Permalinks → Save)
+     */
+    $legacy_page = get_page_by_path('services');
+    $has_archive = ! ($legacy_page && $legacy_page->post_status === 'publish');
+
     register_post_type('service', [
         'labels' => [
             'name'          => 'บริการ',
@@ -738,7 +812,7 @@ add_action('init', function () {
             'edit_item'     => 'แก้ไขบริการ',
         ],
         'public'       => true,
-        'has_archive'  => true,                       // /services/ เป็นหน้ารวม
+        'has_archive'  => $has_archive,               // /services/ เป็นหน้ารวม (หลัง Trash Page เดิม)
         'rewrite'      => ['slug' => 'services', 'with_front' => false],
         'menu_icon'    => 'dashicons-hammer',
         'supports'     => ['title', 'editor', 'excerpt', 'thumbnail', 'revisions', 'page-attributes'],
@@ -1246,7 +1320,12 @@ function gc_get_faqs(int $service_id): array
         'posts_per_page' => 20,
         'orderby'        => 'menu_order',
         'order'          => 'ASC',
-        'meta_query'     => [['key' => 'faq_service', 'value' => $service_id]],
+        // รับทั้ง ID (จาก ACF Post Object) และ slug (จากไฟล์ Import ที่ ID ไม่ตรงกับเว็บต้นทาง)
+        'meta_query'     => [[
+            'key'     => 'faq_service',
+            'value'   => [(string) $service_id, (string) get_post_field('post_name', $service_id)],
+            'compare' => 'IN',
+        ]],
         'no_found_rows'  => true,
     ]);
 
@@ -1514,9 +1593,13 @@ add_action('after_setup_theme', function () {
     add_theme_support('post-thumbnails');
     set_post_thumbnail_size(1200, 630, true);          // og:image + cover
     add_image_size('card', 800, 450, true);            // การ์ดในหน้ารวม
+});
+
+// 1536x1536 / 2048x2048 ถูก core ลงทะเบียนตอน init priority 10 → ต้องลบ "หลัง" จากนั้น (ใน after_setup_theme ยังไม่มีให้ลบ)
+add_action('init', function () {
     remove_image_size('1536x1536');
     remove_image_size('2048x2048');
-});
+}, 11);
 
 // 4) Lazy load: WP ใส่ loading="lazy" ให้รูปในเนื้อหาอยู่แล้ว (ตั้งแต่ 5.5)
 //    แต่รูปแรกของหน้า (LCP) ต้อง "ไม่" lazy และควร fetchpriority="high" - WP 6.3+ ทำให้อัตโนมัติ
@@ -1598,8 +1681,9 @@ add_filter('wp_get_attachment_image_attributes', function (array $attr, $attachm
 
 | ตัวชี้วัด                              | ก่อน (จากช่วง 20:30) | หลัง Module 3-6 | เครื่องมือ                     |
 | -------------------------------------- | -------------------- | --------------- | ------------------------------ |
-| จำนวน `<h1>` หน้าบริการ / หน้าแรก       | 2 / 1 (โลโก้)         |                 | Console                        |
-| ความยาว `<title>` หน้าแรก               | 120+                 |                 | View Source                    |
+| จำนวน `<h1>` หน้าบริการ / หน้าแรก / หน้ารวมบทความ | 2 / 1 ("หน้าแรก") / 0 |             | Console                        |
+| `<title>` หน้าแรก                        | `หน้าแรก - GeniusCorp` (ไม่บอกคุณค่า) |    | View Source                    |
+| Tagline ใต้โลโก้                         | 110 ตัวอักษร keyword stuffing |         | View Source ค้น `site-description` |
 | meta description หน้าบทความ            | auto/boilerplate     |                 | View Source                    |
 | จำนวน `application/ld+json` หน้าบริการ  | 1 (Article ผิด) + microdata ของ Astra |   | View Source                    |
 | @type ในหน้าบริการ                      | Article (ผิด)         |                 | validator.schema.org           |
@@ -1613,6 +1697,17 @@ add_filter('wp_get_attachment_image_attributes', function (array $attr, $attachm
 | Plugin ที่เปิดใช้                        | 23                   |                 | Plugins page                   |
 
 ### ขั้นที่ 2 - Checklist 20 ข้อ (ติ๊กจริง)
+
+> ⚠️ **เปิด Child Theme อย่างเดียวไม่ทำให้ผ่าน 20 ข้อ** และไม่ควรคาดหวังแบบนั้น เพราะแต่ละข้อมี "เจ้าของ" ต่างกัน 3 กลุ่ม ตารางนี้บอกว่าข้อไหนใครแก้ (ผลจากการทดสอบโค้ดเฉลยจริงบน WordPress + Astra + Rank Math + ACF ฟรี):
+>
+> | กลุ่ม | ข้อที่ผ่านทันที | วิธี |
+> | --- | --- | --- |
+> | **A. โค้ดใน Child Theme** (แค่ Activate) | 3, 5, 6, 8, 9 (ส่วน H1), 11, 12, 13, 14 (Article/Breadcrumb), 4 (article:author/published_time), og:site_name | `geo-cleanup.php`, `geo-metadata.php`, `geo-headings.php`, `geo-schema.php` |
+> | **B. ตั้งค่า plugin** (Rank Math + Tagline) | 1, 2 (template `%excerpt%`), 4 (og:type), Schema Type = None, Knowledge Graph = Company | ตั้งมือตามตาราง 3.2 **หรือ** Tools → **GEO Setup** → กดปุ่ม (ปุ่มตั้งค่าเดียวกันทุก key ให้ดูตารางก่อน-หลังในหน้านั้น) |
+> | **C. เนื้อหา** (ทีมคอนเทนต์/ผู้เรียน) | 2 (เขียน excerpt จริง), 9 (การ์ด H3, hero H1), 10, 14 (Service+Offer ต้องเป็น CPT), 15 (FAQ), 16 (lastmod) | แก้ในหน้า edit ทีละหน้า หรือ Import `demo-site/geniuscorp-wp-demo-after.xml` ลงเว็บเปล่าเพื่อดูสภาพที่ทำเสร็จแล้ว |
+> | **D. Performance** | 18, 19, 20 | Module 6: cache plugin, ลด plugin, รูป WebP (โค้ดใน `geo-performance.php` ช่วยเฉพาะ jquery-migrate, WebP รูปใหม่, LCP eager) |
+>
+> ข้อ 7, 16, 17 ทำใน Day 4 · ผลทดสอบเฉลยที่ทำครบ A+B+C บนเว็บทดสอบ: หน้าบริการมี Service + Offer + FAQPage (4 คำถาม) + BreadcrumbList ใน JSON-LD block เดียว, ทุกหน้า H1 = 1, canonical ของ `/blog/page/2/` และ `/services/?utm_source=x` ถูกต้อง, `service-sitemap.xml` โผล่ใน sitemap_index
 
 - [ ] 1 Title ไม่ซ้ำ ~50-60 ตัวอักษร
 - [ ] 2 Meta description รายหน้าเขียนจริง
@@ -1637,8 +1732,8 @@ add_filter('wp_get_attachment_image_attributes', function (array $attr, $attachm
 
 ### ขั้นที่ 3 - การบ้านก่อน Day 4
 
-1. ทำ Checklist ให้ครบยกเว้นข้อ 7, 16, 17
-2. ย้าย 3 บริการเป็น CPT `service` + ใส่ราคา/ระยะเวลา/FAQ ครบ + ตั้ง 301 จาก URL เดิม
+1. ทำ Checklist ให้ครบยกเว้นข้อ 7, 16, 17 (ใช้ตารางกลุ่ม A-D ด้านบนไล่ทีละกลุ่ม)
+2. ย้าย 3 บริการเป็น CPT `service` (บริการ → เพิ่มบริการใหม่ คัดลอกเนื้อหามาโดย**ไม่เอา `<h1>` ติดมา**) + ใส่ excerpt/ราคา/ระยะเวลา/FAQ ครบ → **Trash หน้า Page "บริการ" (slug `services`) และ 3 หน้าบริการเดิม** → Settings → Permalinks → Save (URL `/services/` จะกลายเป็น archive ของ CPT ทันทีที่ไม่มี Page slug นี้ - ดู comment ใน `geo-post-types.php`) → ตั้ง 301 ใน Rank Math → Redirections จาก `/web-development/` → `/services/web-development/` ครบ 3 หน้า · เฉลยเนื้อหาทั้งหมดอยู่ใน `demo-site/geniuscorp-wp-demo-after.xml` (ดู README วิธีใช้)
 3. กรอกโปรไฟล์ผู้เขียน (Users → Profile: Biographical Info, Website, ACF job_title/social_links) ให้ครบ เพราะ Day 4 จะทำ Author Box จากข้อมูลนี้
 4. ลด plugin ให้เหลือ ≤ 10 และจดว่าลบอะไรไปบ้าง
 5. Export เว็บเก็บไว้เป็น snapshot "หลัง Retrofit" สำหรับ Deploy ใน Day 4: ถ้าต้องการย้ายทั้งเว็บ (รวม theme/plugin/รูป) ให้ติดตั้ง All-in-One WP Migration แล้ว Export เป็น `.wpress` ถ้าต้องการเฉพาะเนื้อหาให้ใช้ Tools → Export (.xml)
@@ -1651,7 +1746,7 @@ add_filter('wp_get_attachment_image_attributes', function (array $attr, $attachm
 wp-content/themes/geniuscorp-geo/
 ├── style.css                     ← header child theme + CSS ของ FAQ/breadcrumb
 ├── functions.php                 ← enqueue + require inc/*.php
-├── header.php                    ← (override เฉพาะถ้า theme ไม่มี filter) โลโก้เป็น h1 เฉพาะหน้าแรก
+├── header.php.example            ← ตัวอย่าง override เฉพาะถ้า theme ไม่มี filter (Astra มี ไม่ต้องใช้)
 ├── archive-service.php           ← หน้ารวมบริการ: H1 + การ์ดเป็น H3 + ราคา/วัน
 ├── single-service.php            ← หน้าบริการ: breadcrumb + H1 + facts + content + FAQ
 ├── template-parts/
@@ -1663,11 +1758,14 @@ wp-content/themes/geniuscorp-geo/
     ├── geo-cleanup.php           ← ลบ meta keywords/emoji/oEmbed, ปิด Schema ของ Rank Math/Theme/Builder, ปิด XML-RPC
     ├── geo-post-types.php        ← CPT service + ACF fields (price_from, duration_days, faqs repeater) + sitemap
     ├── geo-metadata.php          ← บังคับ excerpt, canonical filter, OG article:author/og:type
-    ├── geo-headings.php          ← filter site title tag
+    ├── geo-headings.php          ← โลโก้เป็น <p>, ลด <h1> ในเนื้อหาเป็น <h2>, ปิด H1 "หน้าแรก" ของ Astra เมื่อ hero เป็น H1, ใส่ H1 ให้ Posts page
     ├── geo-schema.php            ← gc_site(), builders (organization/website/webpage/service/article/person/breadcrumb/faq), gc_build_graph(), wp_head hook
     ├── geo-faq.php               ← gc_get_faqs() (Repeater หรือ CPT faq), guideline ในหน้า Admin
-    └── geo-performance.php       ← dequeue CSS/JS, jquery-migrate, WebP, image sizes, LCP eager
+    ├── geo-performance.php       ← dequeue CSS/JS, jquery-migrate, WebP, image sizes, LCP eager
+    └── geo-setup.php             ← Tools → GEO Setup: ตั้งค่า Rank Math/Tagline ตามตาราง 3.2 ปุ่มเดียว (ใช้ตรวจคำตอบ/สาธิต)
 ```
+
+ไฟล์ประกอบใน `demo-site/`: `geniuscorp-wp-demo.xml` (ก่อนแก้), `geniuscorp-wp-demo-after.xml` (หลังแก้ = เฉลยเนื้อหา: excerpt ทุกโพสต์, H1/H2/H3 ถูก, CPT service 3 ตัวพร้อมราคา/ระยะเวลา/FAQ 12 ข้อ, post_modified ต่างกัน), `README.md`
 
 ---
 

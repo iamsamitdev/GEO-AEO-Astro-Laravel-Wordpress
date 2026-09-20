@@ -1,8 +1,0 @@
-<?php
-// ตัวอย่างการ override header.php ใน child theme เมื่อ parent ไม่มี filter ให้เปลี่ยน tag ของโลโก้
-// คัดลอก header.php ทั้งไฟล์จาก parent มาไว้ใน child แล้วแก้เฉพาะส่วนโลโก้ให้เป็นแบบนี้
-?>
-<?php $tag = is_front_page() ? 'h1' : 'p'; ?>
-<<?php echo $tag; ?> class="site-title">
-    <a href="<?php echo esc_url(home_url('/')); ?>" rel="home"><?php bloginfo('name'); ?></a>
-</<?php echo $tag; ?>>
